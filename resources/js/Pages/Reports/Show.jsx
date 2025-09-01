@@ -10,8 +10,8 @@ function ShowReport({ auth, report }) {
 
     return (
         <>
-            <Header user={auth.user} level={auth.user.level}/>
-            <Sidebar active="reports" />
+            <Header user={auth.user}/>
+            <Sidebar active="reports"  level={auth.user.level}/>
             <div className="content-wrapper">
                 <section className="content-header">
                     <div className="container-fluid">
