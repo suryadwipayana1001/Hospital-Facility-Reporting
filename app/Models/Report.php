@@ -19,6 +19,7 @@ class Report extends Model
         'status',
         'note',
         'created_by',
+        'updated_by'
     ];
 
     public function user()

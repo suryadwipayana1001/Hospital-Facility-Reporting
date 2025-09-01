@@ -57,11 +57,11 @@ function ModalDetailReport({ show, close, report }) {
                         </tr>
                         <tr>
                             <th>Dibuat oleh</th>
-                            <td>{report.created_by?.name || "-"}</td>
+                            <td>{report.creator?.name || "-"}</td>
                         </tr>
                         <tr>
                             <th>Terakhir diupdate oleh</th>
-                            <td>{report.updated_by?.name || "-"}</td>
+                            <td>{report.updater?.username || "-"}</td>
                         </tr>
                         <tr>
                             <th>Tanggal Dibuat</th>

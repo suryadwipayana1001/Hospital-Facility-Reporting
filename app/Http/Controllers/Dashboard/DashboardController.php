@@ -13,11 +13,17 @@ class DashboardController extends Controller
     {
         $name = $request->input('name');
 
-        $reports = collect(); 
+        $reports = collect();
 
         if ($request->isMethod('post') && $name) {
             $reports = Report::query()
+                ->with(['creator', 'updater']) 
                 ->where('name', 'like', "%{$name}%")
+                ->latest()
+                ->paginate(5);
+        } else {
+            $reports = Report::query()
+                ->with(['creator', 'updater'])
                 ->latest()
                 ->paginate(5);
         }
