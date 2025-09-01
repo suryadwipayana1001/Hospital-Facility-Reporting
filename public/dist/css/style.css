@@ -1,0 +1,203 @@
+/* color */
+:root {
+    --green-color: rgb(15, 202, 37);
+    --blue-color: #2259da;
+    --dark-gray-color: #505158;
+    --red-color: #FF0000;
+    --white-color: #FFFFFF;
+    --black-color: #000000;
+    --gray-color:#DEDEDE;
+}
+
+h1 {
+    font-weight: 800;
+}
+
+.nav-pills .nav-link.active {
+    color: var(--white-color) !important;
+    background-color: var(--blue-color) !important;
+}
+
+
+.btn-dark-blue {
+    background-color: var(--blue-color) !important;
+    color: var(--white-color) !important;
+}
+
+.btn-green {
+    background-color: var(--green-color) !important;
+    color: var(--white-color) !important;
+}
+
+.btn-red {
+    background-color: var(--red-color) !important;
+    color: var(--white-color) !important;
+}
+
+.currency-bg {
+    background-color: var();
+}
+
+.background {
+    background-color: var(--black-color);
+    opacity: 0.5;
+}
+
+.background-login {
+    /* background-image: url('../img/background-login.jpg'); */
+    /* background-size: cover; */
+    /* background-position: center; */
+    background-color:  var(--dark-gray-color);
+    width: 100%;
+    height: 100vh;
+}
+
+.long-logo {
+    background-image: url('../img/long logo.jpg');
+    width: 100px;
+    height: 20px;
+}
+
+.logo-login {
+    width: 30px;
+    height: 40px;
+    background-image: url('../img/logo-none.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-left: 10px;
+    vertical-align: middle;
+    
+}
+
+.logo-sidebar {
+    margin-top: 30px;
+    width: 40px;
+    height: 50px;
+    display: inline-block;
+    background-image: url('../img/logo-none.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+.header-modal {
+    background-color: var(--dark-gray-color) !important;
+    color: var(--white-color);
+}
+
+.card-primary:not(.card-outline)>.card-header {
+    background-color: var() !important;
+}
+
+.page-item.active .page-link {
+    background-color: var(--blue-color);
+    color: var(--white-color);
+    border-color: var(--blue-color);
+}
+
+.page-link {
+    color: var(--green-color);
+}
+
+.page-link:hover {
+    color: var(--blue-color);
+}
+
+.currency-text {
+    text-align: center;
+    font-size: 17px;
+    font-weight: bold;
+    color:var(--white-color);
+}
+.center-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    font-weight: bold;
+    color: var();
+}
+.text {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    text-align: right;
+    font-size: 17px;
+    height: 38px;
+    color:var();
+    font-weight: bold;
+}
+
+.currency-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 20px;
+    color:var(--white-color);
+}
+
+.title {
+    text-align: right;
+    font-weight: bold;
+    font-size: 20px;
+    color:var(--white-color);
+}
+
+.currency-title-dashboard {
+    text-align: center;
+    font-weight: bold;
+    font-size: 20px;
+    color:var(--blue-color);
+}
+
+.title-dashboard {
+    text-align: right;
+    font-weight: bold;
+    font-size: 20px;
+    color:var(--blue-color);
+}
+.marquee-text{
+    font-weight: bold;
+    font-size: 17px;
+}
+.footer{
+    color: var(--white-color);
+    background-color: var(--blue-color);
+    border-top: 3px solid var(--white-color);
+    border-bottom: 3px solid var(--white-color);
+    text-align: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    margin-bottom: 20px;
+}
+.bg-title{
+    border-right: 20px solid var();
+}
+.bg-title-dashboard{
+    border-right: 20px solid transparent;
+}
+.bg-1 {
+    border-right: 5px solid var();
+    border-left: 5px solid var();
+    background-color: var(--white-color);
+}
+
+.bg-2 {
+    border-right: 5px solid var();
+    border-left: 5px solid var();
+    background-color: var(--gray-color);
+}
+
+.bg-1 {
+    border-right: 5px solid var(--white-color);
+    border-left: 5px solid var(--white-color);
+    background-color: var(--white-color);
+}
+
+.bg-2 {
+    border-right: 5px solid var(--white-color);
+    border-left: 5px solid var(--white-color);
+    background-color: var(--gray-color);
+}

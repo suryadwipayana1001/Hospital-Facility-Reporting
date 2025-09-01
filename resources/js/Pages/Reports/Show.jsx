@@ -1,0 +1,112 @@
+import React from 'react';
+import { usePage } from '@inertiajs/inertia-react';
+import Header from '../../Layouts/Header';
+import Sidebar from '../../Layouts/Sidebar';
+import Footer from '../../Layouts/Footer';
+import { Inertia } from '@inertiajs/inertia';
+
+function ShowReport({ auth, report }) {
+    const { errors } = usePage().props;
+
+    return (
+        <>
+            <Header user={auth.user} level={auth.user.level}/>
+            <Sidebar active="reports" />
+            <div className="content-wrapper">
+                <section className="content-header">
+                    <div className="container-fluid">
+                        <div className="row mb-2">
+                            <div className="col-sm-6">
+                                <h1>Detail Pengaduan</h1>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section className="content">
+                    <div className="container-fluid">
+                        <div className="col-md-12">
+                            <div className="card card-primary">
+                                <div className="card-header">
+                                    <h3 className="card-title">Informasi Pengaduan</h3>
+                                </div>
+                                <div className="card-body">
+                                    <table className="table table-bordered">
+                                        <tbody>
+                                            <tr>
+                                                <th style={{ width: "250px" }}>Nomor Laporan</th>
+                                                <td>{report.custom_id}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Nama Pelapor</th>
+                                                <td>{report.name}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Posisi</th>
+                                                <td>{report.positions}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Ruangan</th>
+                                                <td>{report.room}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Fasilitas</th>
+                                                <td>{report.facility}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Deskripsi</th>
+                                                <td>{report.description}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Status</th>
+                                                <td>
+                                                    <span className={`badge 
+                                                        ${report.status === "Sedang diajukan" ? "badge-warning" : 
+                                                          report.status === "Sedang diproses" ? "badge-info" : 
+                                                          "badge-success"}`}>
+                                                        {report.status}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Catatan</th>
+                                                <td>{report.note || "-"}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Dibuat oleh</th>
+                                                <td>{report.created_by?.name || "-"}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Terakhir diupdate oleh</th>
+                                                <td>{report.updated_by?.name || "-"}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Tanggal Dibuat</th>
+                                                <td>{new Date(report.created_at).toLocaleString()}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Terakhir Diperbarui</th>
+                                                <td>{new Date(report.updated_at).toLocaleString()}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="col d-flex justify-content-end mb-3">
+                                <button 
+                                    onClick={() => Inertia.get("/reports", {}, { preserveState: false })} 
+                                    className="btn btn-red mr-2"
+                                    >
+                                    Kembali
+                                </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <Footer />
+        </>
+    );
+}
+
+export default ShowReport;
