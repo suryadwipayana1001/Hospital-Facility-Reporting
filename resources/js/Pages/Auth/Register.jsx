@@ -15,16 +15,26 @@ function Register({ auth }) {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+    const [loading, setLoading] = useState(false);
+
     const storeRegister = async (e) => {
         e.preventDefault();
-        Inertia.post('/register', {
-            name,
-            username,
-            password,
-            password_confirmation: passwordConfirmation,
-            level, 
-        });
+        setLoading(true);
+        Inertia.post(
+            '/register',
+            {
+                name,
+                username,
+                password,
+                password_confirmation: passwordConfirmation,
+                level,
+            },
+            {
+                onFinish: () => setLoading(false),
+            }
+        );
     };
+
     useEffect(() => {
         const channel = window.Echo.channel("reports")
             .listen(".ReportCreated", (e) => {
@@ -37,6 +47,7 @@ function Register({ auth }) {
                 }
             });
     }, [auth.user.level]);
+
     return (
         <>
             <Header user={auth.user} />
@@ -59,6 +70,7 @@ function Register({ auth }) {
                                     <h3 className="card-title">Form Daftar</h3>
                                 </div>
                                 <div className="card-body">
+                                    {/* Input fields */}
                                     <div className="form-group">
                                         <label>Nama Unit</label>
                                         <input
@@ -145,14 +157,16 @@ function Register({ auth }) {
                                         <button
                                             onClick={() => window.history.back()}
                                             className="btn btn-danger mr-3"
+                                            disabled={loading} // ⬅️ disable kalau loading
                                         >
                                             Back
                                         </button>
                                         <button
                                             onClick={storeRegister}
                                             className="btn btn-dark-blue mr-3"
+                                            disabled={loading} // ⬅️ disable kalau loading
                                         >
-                                            Daftar
+                                            {loading ? "Loading..." : "Daftar"}
                                         </button>
                                     </div>
                                 </div>

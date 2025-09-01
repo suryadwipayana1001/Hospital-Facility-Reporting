@@ -12,17 +12,22 @@ function CreateReport({ auth }) {
     const [room, setRoom] = useState('');
     const [facility, setFacility] = useState('');
     const [description, setDescription] = useState('');
-
+    const [isLoading, setIsLoading] = useState(false);
     const storeReport = (e) => {
         e.preventDefault();
+        setIsLoading(true);
+
         Inertia.post('/reports', {
             name,
             positions,
             room,
             facility,
             description,
+        }, {
+            onFinish: () => setIsLoading(false),
         });
     };
+
     useEffect(() => {
         const channel = window.Echo.channel("reports")
             .listen(".ReportCreated", (e) => {
@@ -67,6 +72,7 @@ function CreateReport({ auth }) {
                                                 value={name}
                                                 onChange={(e) => setName(e.target.value)}
                                                 placeholder="Masukkan Nama"
+                                                disabled={isLoading}
                                             />
                                             {errors.name && <div className="text-danger">{errors.name}</div>}
                                         </div>
@@ -78,6 +84,7 @@ function CreateReport({ auth }) {
                                                 value={positions}
                                                 onChange={(e) => setPositions(e.target.value)}
                                                 placeholder="Masukkan Jabatan"
+                                                disabled={isLoading}
                                             />
                                             {errors.positions && <div className="text-danger">{errors.positions}</div>}
                                         </div>
@@ -89,6 +96,7 @@ function CreateReport({ auth }) {
                                                 value={room}
                                                 onChange={(e) => setRoom(e.target.value)}
                                                 placeholder="Masukkan Nama Ruangan"
+                                                disabled={isLoading}
                                             />
                                             {errors.room && <div className="text-danger">{errors.room}</div>}
                                         </div>
@@ -100,6 +108,7 @@ function CreateReport({ auth }) {
                                                 value={facility}
                                                 onChange={(e) => setFacility(e.target.value)}
                                                 placeholder="Masukkan Nama Barang"
+                                                disabled={isLoading}
                                             />
                                             {errors.facility && <div className="text-danger">{errors.facility}</div>}
                                         </div>
@@ -111,6 +120,7 @@ function CreateReport({ auth }) {
                                                 value={description}
                                                 onChange={(e) => setDescription(e.target.value)}
                                                 placeholder="Masukan keterangan seperti kerusakan yang terjadi"
+                                                disabled={isLoading}
                                             ></textarea>
                                             {errors.description && (
                                                 <div className="text-danger">{errors.description}</div>
@@ -118,18 +128,26 @@ function CreateReport({ auth }) {
                                         </div>
                                     </div>
                                     <div className="card-footer d-flex justify-content-end">
-                                    <button 
-                                        type="button"
-                                        onClick={() => Inertia.get("/reports", {}, { preserveState: false })} 
-                                        className="btn btn-red mr-2"
+                                        <button 
+                                            type="button"
+                                            onClick={() => Inertia.get("/reports", {}, { preserveState: false })} 
+                                            className="btn btn-danger mr-2"
+                                            disabled={isLoading}
                                         >
-                                        Kembali
-                                    </button>
-                                        <button type="submit" className="btn btn-primary">
-                                            Ajukan
+                                            Kembali
+                                        </button>
+                                        <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                                            {isLoading ? "Mengajukan..." : "Ajukan"}
                                         </button>
                                     </div>
                                 </form>
+                                {isLoading && (
+                                    <div className="overlay d-flex justify-content-center align-items-center">
+                                        <div className="spinner-border text-primary" role="status">
+                                            <span className="sr-only">Loading...</span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

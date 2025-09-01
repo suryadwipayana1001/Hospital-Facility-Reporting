@@ -14,15 +14,23 @@ function EditRegister({ auth, user }) {
     const [level, setLevel] = useState(user.level); 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = () => {
-        Inertia.put(`/user/${user.id}`, {
-            name,
-            username,
-            password,
-            password_confirmation: passwordConfirmation,
-            level, 
-        });
+        setLoading(true);
+        Inertia.put(
+            `/user/${user.id}`,
+            {
+                name,
+                username,
+                password,
+                password_confirmation: passwordConfirmation,
+                level, 
+            },
+            {
+                onFinish: () => setLoading(false),
+            }
+        );
     };
 
     return (
@@ -47,7 +55,7 @@ function EditRegister({ auth, user }) {
                                     <h3 className="card-title">Form Ubah Data Akun</h3>
                                 </div>
                                 <div className="card-body">
-                                    <div className="form-group">
+                                <div className="form-group">
                                         <label>Nama Unit</label>
                                         <input type="text" className="form-control" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nama Unit" />
                                         {errors.name && (
@@ -65,8 +73,6 @@ function EditRegister({ auth, user }) {
                                             </div>
                                         )}
                                     </div>
-
-                                    {/* ✅ Dropdown Level */}
                                     <div className="form-group">
                                         <label>Level</label>
                                         <select
@@ -106,8 +112,26 @@ function EditRegister({ auth, user }) {
                                 </div>
                                 <div className="row mb-3">
                                     <div className="col d-flex justify-content-end">
-                                        <button onClick={() => window.history.back()} className="btn btn-red mr-3">Back</button>
-                                        <button onClick={handleSubmit} className="btn btn-dark-blue mr-3">Save</button>
+                                        <button
+                                            onClick={() => window.history.back()}
+                                            className="btn btn-red mr-3"
+                                            disabled={loading}
+                                        >
+                                            Back
+                                        </button>
+                                        <button
+                                            onClick={handleSubmit}
+                                            className="btn btn-dark-blue mr-3"
+                                            disabled={loading}
+                                        >
+                                            {loading ? (
+                                                <span>
+                                                    <i className="fas fa-spinner fa-spin mr-2"></i> Saving...
+                                                </span>
+                                            ) : (
+                                                "Save"
+                                            )}
+                                        </button>
                                     </div>
                                 </div>
                             </div>

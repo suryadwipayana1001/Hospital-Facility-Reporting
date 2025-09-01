@@ -17,6 +17,7 @@ function EditReport({ auth, report }) {
     const [note, setNote] = useState(report.note ?? "");
 
     const [localErrors, setLocalErrors] = useState({});
+    const [loading, setLoading] = useState(false); // 🔹 loading state
 
     const handleSubmit = () => {
         const newErrors = {};
@@ -33,6 +34,8 @@ function EditReport({ auth, report }) {
         }
 
         setLocalErrors({});
+        setLoading(true); // 🔹 mulai loading
+
         Inertia.put(`/reports/${report.id}`, {
             name,
             positions,
@@ -41,8 +44,11 @@ function EditReport({ auth, report }) {
             description,
             status,
             note,
+        }, {
+            onFinish: () => setLoading(false), // 🔹 berhenti loading setelah request selesai
         });
     };
+
     useEffect(() => {
         const channel = window.Echo.channel("reports")
             .listen(".ReportCreated", (e) => {
@@ -79,6 +85,7 @@ function EditReport({ auth, report }) {
                                     <h3 className="card-title">Form Ubah Laporan</h3>
                                 </div>
                                 <div className="card-body">
+                                    {/* form inputs tetap */}
                                     <div className="form-group">
                                         <label>Nama Pelapor</label>
                                         <input
@@ -170,14 +177,23 @@ function EditReport({ auth, report }) {
                                         <button 
                                             onClick={() => Inertia.get("/reports", {}, { preserveState: false })} 
                                             className="btn btn-red mr-2"
+                                            disabled={loading}
                                         >
                                             Kembali
                                         </button>
                                         <button
                                             onClick={handleSubmit}
                                             className="btn btn-dark-blue mr-3"
+                                            disabled={loading}
                                         >
-                                            Simpan
+                                            {loading ? (
+                                                <>
+                                                    <span className="spinner-border spinner-border-sm mr-2"></span>
+                                                    Menyimpan...
+                                                </>
+                                            ) : (
+                                                "Simpan"
+                                            )}
                                         </button>
                                     </div>
                                 </div>
