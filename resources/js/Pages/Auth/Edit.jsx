@@ -117,7 +117,7 @@ function EditRegister({ auth, user }) {
                                             className="btn btn-red mr-3"
                                             disabled={loading}
                                         >
-                                            Back
+                                            Kembali
                                         </button>
                                         <button
                                             onClick={handleSubmit}
@@ -126,10 +126,10 @@ function EditRegister({ auth, user }) {
                                         >
                                             {loading ? (
                                                 <span>
-                                                    <i className="fas fa-spinner fa-spin mr-2"></i> Saving...
+                                                    <i className="fas fa-spinner fa-spin mr-2"></i> Menyimpan...
                                                 </span>
                                             ) : (
-                                                "Save"
+                                                "Simpan"
                                             )}
                                         </button>
                                     </div>

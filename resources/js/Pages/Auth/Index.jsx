@@ -104,9 +104,10 @@ export default function AuthIndex({ auth, users }) {
                                                         <td>{user.name}</td>
                                                         <td>{user.username}</td>
                                                         <td>{user.level}</td>
-                                                            <td>
+                                                            <td> 
                                                                  <button onClick={() => handleEdit(user.id)} className="btn btn-sm btn-dark-blue">Edit</button>
-                                                                 <button onClick={() => handleShowModal(user.id, user.name)} className="btn btn-sm btn-red ml-2">Hapus</button> 
+                                                                 {user.id != auth.user.id && (
+                                                                 <button onClick={() => handleShowModal(user.id, user.name)} className="btn btn-sm btn-red ml-2">Hapus</button> )}
                                                             </td>
                                                     </tr>
                                                 ))}
