@@ -10,6 +10,7 @@ export default function ReportIndex({ auth, reports: initialReports }) {
     const [showModal, setShowModal] = useState(false);
     const [idReport, setIdReport] = useState(null);
     const [nama, setNama] = useState(null);
+    const [loadingDelete, setLoadingDelete] = useState(false);
 
     const handleShowModal = (id, nama) => {
         setIdReport(id);
@@ -26,13 +27,17 @@ export default function ReportIndex({ auth, reports: initialReports }) {
     };
 
     const deleteReport = (id) => {
+        setLoadingDelete(true);
         Inertia.delete(`/reports/${id}`, {
             onSuccess: () => {
                 setReports(prev => prev.filter(r => r.id !== id));
                 setShowModal(false);
+            },
+            onFinish: () => {
+                setLoadingDelete(false);
             }
         });
-    };
+    };    
     
 
     useEffect(() => {
@@ -77,6 +82,7 @@ export default function ReportIndex({ auth, reports: initialReports }) {
                 close={() => setShowModal(false)}
                 submit={() => deleteReport(idReport)}
                 nama={nama}
+                loading={loadingDelete}
             />
             <Header user={auth.user} />
             <Sidebar active="reports" level={auth.user.level} />
@@ -102,6 +108,7 @@ export default function ReportIndex({ auth, reports: initialReports }) {
                                         <table id="example1" className="table table-bordered table-striped">
                                             <thead>
                                                 <tr>
+                                                    <th>No Pengaduan</th>
                                                     <th>Nama Pelapor</th>
                                                     <th>Fasilitas</th>
                                                     <th>Tanggal</th>
@@ -112,6 +119,7 @@ export default function ReportIndex({ auth, reports: initialReports }) {
                                             <tbody>
                                                 {reports.map((report) => (
                                                     <tr key={report.id}>
+                                                        <td>{report.custom_id}</td>
                                                         <td>{report.name}</td>
                                                         <td>{report.facility}</td>
                                                         <td>{report.created_at.split("T")[0]}</td>
@@ -137,7 +145,7 @@ export default function ReportIndex({ auth, reports: initialReports }) {
                                                             )}
                                                              {auth.user.level === "teknisi" && (
                                                                 <button
-                                                                    onClick={() => handleShowModal(report.id, report.name)}
+                                                                    onClick={() => handleShowModal(report.id, report.custom_id)}
                                                                     className="btn btn-sm btn-red ml-2"
                                                                 >
                                                                     Hapus

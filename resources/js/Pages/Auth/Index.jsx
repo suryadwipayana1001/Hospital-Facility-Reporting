@@ -9,6 +9,7 @@ export default function AuthIndex({ auth, users }) {
     const [showModal, setShowModal] = useState(false);
     const [idUser, setIdUser] = useState(null);
     const [nama, setNama] = useState(null);
+    const [loadingDelete, setLoadingDelete] = useState(false);
 
     const handleShowModal = (id, nama) => {
         setIdUser(id);
@@ -20,11 +21,18 @@ export default function AuthIndex({ auth, users }) {
         Inertia.get(`/user/${id}/edit`);
     }
 
-    const deleteUser = async (id) => {
-        Inertia.delete(`/user/${id}`);
-        console.log("test" + id);
-        setShowModal(false); 
-    };
+    const deleteUser = (id) => {
+        setLoadingDelete(true);
+    
+        Inertia.delete(`/user/${id}`, {
+            onSuccess: () => {
+                setShowModal(false);
+            },
+            onFinish: () => {
+                setLoadingDelete(false);
+            },
+        });
+    };    
 
     useEffect(() => {
         const channel = window.Echo.channel("reports")
@@ -61,7 +69,7 @@ export default function AuthIndex({ auth, users }) {
 
     return (
         <>
-            <ModalDelete title="Hapus Akun" showModal={showModal} close={() => setShowModal(false)} submit={() => deleteUser(idUser)} nama={nama} />
+            <ModalDelete title="Hapus Akun" showModal={showModal} close={() => setShowModal(false)} submit={() => deleteUser(idUser)} nama={nama}   loading={loadingDelete}/>
             <Header user={auth.user} />
             <Sidebar active="user" level={auth.user.level} />
             <div className="content-wrapper">

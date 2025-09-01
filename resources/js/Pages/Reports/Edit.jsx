@@ -65,7 +65,7 @@ function EditReport({ auth, report }) {
                     <div className="container-fluid">
                         <div className="row mb-2">
                             <div className="col-sm-6">
-                                <h1>Edit Report</h1>
+                                <h1>Edit Pengaduan</h1>
                             </div>
                         </div>
                     </div>
