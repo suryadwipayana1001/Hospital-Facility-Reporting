@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePage } from '@inertiajs/inertia-react';
 import { Inertia } from '@inertiajs/inertia';
 import Header from '../../Layouts/Header';
@@ -25,7 +25,18 @@ function Register({ auth }) {
             level, 
         });
     };
+    useEffect(() => {
+        const channel = window.Echo.channel("reports")
+            .listen(".ReportCreated", (e) => {
+                console.log("Event Report Created diterima:", e);
 
+                if (auth.user.level === "teknisi") {
+                    console.log("dindong");
+                    const audio = new Audio("/dist/sound/dingdong.mp3");
+                    audio.play().catch(err => console.error("Gagal play sound:", err));
+                }
+            });
+    }, [auth.user.level]);
     return (
         <>
             <Header user={auth.user} />

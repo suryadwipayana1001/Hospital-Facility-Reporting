@@ -27,6 +27,16 @@ export default function AuthIndex({ auth, users }) {
     };
 
     useEffect(() => {
+        const channel = window.Echo.channel("reports")
+        .listen(".ReportCreated", (e) => {
+            console.log("Event Report Created diterima:", e);
+
+            if (auth.user.level === "teknisi") {
+                console.log("dindong");
+                const audio = new Audio("/dist/sound/dingdong.mp3");
+                audio.play().catch(err => console.error("Gagal play sound:", err));
+            }
+        });
         if (window.$) {
             $(function () {
                 $("#example1").DataTable({
@@ -47,7 +57,7 @@ export default function AuthIndex({ auth, users }) {
         } else {
             console.error("jQuery belum dimuat, pastikan Anda telah memuatnya sebelum menambahkan kode ini.");
         }
-    }, []);
+    }, [auth.user.level]);
 
     return (
         <>

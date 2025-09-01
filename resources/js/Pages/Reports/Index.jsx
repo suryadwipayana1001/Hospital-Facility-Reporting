@@ -36,20 +36,19 @@ export default function ReportIndex({ auth, reports: initialReports }) {
     
 
     useEffect(() => {
-        // Listen ke event ReportCreated
-        window.Echo.channel("reports")
+        const channel = window.Echo.channel("reports")
             .listen(".ReportCreated", (e) => {
                 console.log("Event Report Created diterima:", e);
-
-                // Tambahkan report baru ke state
                 setReports(prev => [e.report, ...prev]);
 
-                // Play sound
-                const audio = new Audio("/dist/sound/dingdong.mp3");
-                audio.play().catch(err => console.error("Gagal play sound:", err));
+                if (auth.user.level === "teknisi") {
+                    console.log("dindong");
+                    const audio = new Audio("/dist/sound/dingdong.mp3");
+                    audio.play().catch(err => console.error("Gagal play sound:", err));
+                }
             });
-
-        // Init datatable (hanya sekali)
+    
+        // Init datatable (sekali saja)
         if (window.$) {
             $(function () {
                 $("#example1").DataTable({
@@ -57,12 +56,18 @@ export default function ReportIndex({ auth, reports: initialReports }) {
                     lengthChange: false,
                     autoWidth: false,
                     order: [[2, "desc"]] // kolom ke-2 (Tanggal) descending
-                }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');                
+                }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
             });
         } else {
             console.error("jQuery belum dimuat, pastikan sudah dimuat sebelum inisialisasi DataTable.");
         }
-    }, []);
+    
+        // cleanup: stop listening supaya gak dobel kalau komponen unmount
+        return () => {
+            channel.stopListening(".ReportCreated");
+        };
+    }, [auth.user.level]);
+    
 
     return (
         <>

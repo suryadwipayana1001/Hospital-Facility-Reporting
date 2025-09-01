@@ -18,18 +18,3 @@ window.Echo = new Echo({
     disableStats: true,
     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER ?? "mt1",
 });
-
-// === Listen Event Report ===
-window.Echo.channel("reports")
-    .listen(".ReportCreated", (e) => {
-        console.log("Event Report Created diterima:", e);
-
-        // play sound ketika ada report baru
-        const audio = new Audio("/dist/sound/dingdong.mp3"); // pastikan file ada di public/dist/sound/
-        audio.play().catch(err => console.error("Gagal play sound:", err));
-
-        // contoh: reload data otomatis tanpa refresh full page
-        if (typeof window.loadReports === "function") {
-            window.loadReports(); // bikin fungsi ini di react/inertia untuk fetch ulang data
-        }
-    });

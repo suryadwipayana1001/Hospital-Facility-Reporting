@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { usePage } from '@inertiajs/inertia-react';
 import { Inertia } from '@inertiajs/inertia';
 import Header from '../../Layouts/Header';
@@ -23,6 +23,18 @@ function CreateReport({ auth }) {
             description,
         });
     };
+    useEffect(() => {
+        const channel = window.Echo.channel("reports")
+            .listen(".ReportCreated", (e) => {
+                console.log("Event Report Created diterima:", e);
+
+                if (auth.user.level === "teknisi") {
+                    console.log("dindong");
+                    const audio = new Audio("/dist/sound/dingdong.mp3");
+                    audio.play().catch(err => console.error("Gagal play sound:", err));
+                }
+            });
+    }, [auth.user.level]);
 
     return (
         <>
@@ -106,12 +118,13 @@ function CreateReport({ auth }) {
                                         </div>
                                     </div>
                                     <div className="card-footer d-flex justify-content-end">
-                                        <button 
-                                            onClick={() => Inertia.get("/reports", {}, { preserveState: false })} 
-                                            className="btn btn-red mr-2"
-                                            >
-                                            Kembali
-                                        </button>
+                                    <button 
+                                        type="button"
+                                        onClick={() => Inertia.get("/reports", {}, { preserveState: false })} 
+                                        className="btn btn-red mr-2"
+                                        >
+                                        Kembali
+                                    </button>
                                         <button type="submit" className="btn btn-primary">
                                             Ajukan
                                         </button>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import Header from '../../Layouts/Header';
 import Sidebar from '../../Layouts/Sidebar';
 import Footer from '../../Layouts/Footer';
@@ -16,6 +16,19 @@ export default function ReportIndex({ auth, reports, totalReports, filters }) {
     const handleExport = () => {
         window.open(`/reports-file/export?start_date=${startDate}&end_date=${endDate}`, '_blank');
     };
+
+    useEffect(() => {
+        const channel = window.Echo.channel("reports")
+            .listen(".ReportCreated", (e) => {
+                console.log("Event Report Created diterima:", e);
+
+                if (auth.user.level === "teknisi") {
+                    console.log("dindong");
+                    const audio = new Audio("/dist/sound/dingdong.mp3");
+                    audio.play().catch(err => console.error("Gagal play sound:", err));
+                }
+            });
+    }, [auth.user.level]);
 
     return (
         <>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { usePage } from "@inertiajs/inertia-react";
 import { Inertia } from "@inertiajs/inertia";
 import Header from "../../Layouts/Header";
@@ -16,7 +16,23 @@ function EditReport({ auth, report }) {
     const [status, setStatus] = useState(report.status ?? "Sedang diajukan");
     const [note, setNote] = useState(report.note ?? "");
 
+    const [localErrors, setLocalErrors] = useState({});
+
     const handleSubmit = () => {
+        const newErrors = {};
+        if (!name.trim()) newErrors.name = "Nama pelapor tidak boleh kosong !";
+        if (!positions.trim()) newErrors.positions = "Jabatan tidak boleh kosong !";
+        if (!room.trim()) newErrors.room = "Ruangan tidak boleh kosong !";
+        if (!facility.trim()) newErrors.facility = "Fasilitas tidak boleh kosong !";
+        if (!description.trim()) newErrors.description = "Deskripsi tidak boleh kosong !";
+        if (!status.trim()) newErrors.status = "Status tidak boleh kosong";
+
+        if (Object.keys(newErrors).length > 0) {
+            setLocalErrors(newErrors);
+            return;
+        }
+
+        setLocalErrors({});
         Inertia.put(`/reports/${report.id}`, {
             name,
             positions,
@@ -27,11 +43,23 @@ function EditReport({ auth, report }) {
             note,
         });
     };
+    useEffect(() => {
+        const channel = window.Echo.channel("reports")
+            .listen(".ReportCreated", (e) => {
+                console.log("Event Report Created diterima:", e);
+
+                if (auth.user.level === "teknisi") {
+                    console.log("dindong");
+                    const audio = new Audio("/dist/sound/dingdong.mp3");
+                    audio.play().catch(err => console.error("Gagal play sound:", err));
+                }
+            });
+    }, [auth.user.level]);
 
     return (
         <>
             <Header user={auth.user}/>
-            <Sidebar active="reports"  level={auth.user.level}/>
+            <Sidebar active="reports" level={auth.user.level}/>
             <div className="content-wrapper">
                 <section className="content-header">
                     <div className="container-fluid">
@@ -59,9 +87,8 @@ function EditReport({ auth, report }) {
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
                                         />
-                                        {errors.name && (
-                                            <div className="alert alert-danger">{errors.name}</div>
-                                        )}
+                                        {localErrors.name && <div className="text-danger">{localErrors.name}</div>}
+                                        {errors.name && <div className="text-danger">{errors.name}</div>}
                                     </div>
 
                                     <div className="form-group">
@@ -72,6 +99,8 @@ function EditReport({ auth, report }) {
                                             value={positions}
                                             onChange={(e) => setPositions(e.target.value)}
                                         />
+                                        {localErrors.positions && <div className="text-danger">{localErrors.positions}</div>}
+                                        {errors.positions && <div className="text-danger">{errors.positions}</div>}
                                     </div>
 
                                     <div className="form-group">
@@ -82,6 +111,8 @@ function EditReport({ auth, report }) {
                                             value={room}
                                             onChange={(e) => setRoom(e.target.value)}
                                         />
+                                        {localErrors.room && <div className="text-danger">{localErrors.room}</div>}
+                                        {errors.room && <div className="text-danger">{errors.room}</div>}
                                     </div>
 
                                     <div className="form-group">
@@ -92,6 +123,8 @@ function EditReport({ auth, report }) {
                                             value={facility}
                                             onChange={(e) => setFacility(e.target.value)}
                                         />
+                                        {localErrors.facility && <div className="text-danger">{localErrors.facility}</div>}
+                                        {errors.facility && <div className="text-danger">{errors.facility}</div>}
                                     </div>
 
                                     <div className="form-group">
@@ -102,7 +135,10 @@ function EditReport({ auth, report }) {
                                             value={description}
                                             onChange={(e) => setDescription(e.target.value)}
                                         />
+                                        {localErrors.description && <div className="text-danger">{localErrors.description}</div>}
+                                        {errors.description && <div className="text-danger">{errors.description}</div>}
                                     </div>
+
                                     <div className="form-group">
                                         <label>Status</label>
                                         <select
@@ -114,9 +150,8 @@ function EditReport({ auth, report }) {
                                             <option value="Sedang diproses">Sedang diproses</option>
                                             <option value="Selesai diproses">Selesai diproses</option>
                                         </select>
-                                        {errors.status && (
-                                            <div className="alert alert-danger">{errors.status}</div>
-                                        )}
+                                        {localErrors.status && <div className="text-danger">{localErrors.status}</div>}
+                                        {errors.status && <div className="text-danger">{errors.status}</div>}
                                     </div>
 
                                     <div className="form-group">
@@ -135,7 +170,7 @@ function EditReport({ auth, report }) {
                                         <button 
                                             onClick={() => Inertia.get("/reports", {}, { preserveState: false })} 
                                             className="btn btn-red mr-2"
-                                            >
+                                        >
                                             Kembali
                                         </button>
                                         <button

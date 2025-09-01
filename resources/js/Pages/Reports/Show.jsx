@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { usePage } from '@inertiajs/inertia-react';
 import Header from '../../Layouts/Header';
 import Sidebar from '../../Layouts/Sidebar';
@@ -7,7 +7,18 @@ import { Inertia } from '@inertiajs/inertia';
 
 function ShowReport({ auth, report }) {
     const { errors } = usePage().props;
+    useEffect(() => {
+        const channel = window.Echo.channel("reports")
+            .listen(".ReportCreated", (e) => {
+                console.log("Event Report Created diterima:", e);
 
+                if (auth.user.level === "teknisi") {
+                    console.log("dindong");
+                    const audio = new Audio("/dist/sound/dingdong.mp3");
+                    audio.play().catch(err => console.error("Gagal play sound:", err));
+                }
+            });
+    }, [auth.user.level]);
     return (
         <>
             <Header user={auth.user}/>
