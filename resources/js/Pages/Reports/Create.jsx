@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePage } from '@inertiajs/inertia-react';
 import { Inertia } from '@inertiajs/inertia';
 import Header from '../../Layouts/Header';
@@ -12,18 +12,25 @@ function CreateReport({ auth }) {
     const [room, setRoom] = useState('');
     const [facility, setFacility] = useState('');
     const [description, setDescription] = useState('');
+    const [image, setImage] = useState(null); // ⬅️ tambah state image
     const [isLoading, setIsLoading] = useState(false);
+
     const storeReport = (e) => {
         e.preventDefault();
         setIsLoading(true);
 
-        Inertia.post('/reports', {
-            name,
-            positions,
-            room,
-            facility,
-            description,
-        }, {
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('positions', positions);
+        formData.append('room', room);
+        formData.append('facility', facility);
+        formData.append('description', description);
+        if (image) {
+            formData.append('image', image);
+        }
+
+        Inertia.post('/reports', formData, {
+            forceFormData: true, // penting supaya inertia kirim multipart/form-data
             onFinish: () => setIsLoading(false),
         });
     };
@@ -34,7 +41,6 @@ function CreateReport({ auth }) {
                 console.log("Event Report Created diterima:", e);
 
                 if (auth.user.level === "teknisi") {
-                    console.log("dindong");
                     const audio = new Audio("/dist/sound/dingdong.mp3");
                     audio.play().catch(err => console.error("Gagal play sound:", err));
                 }
@@ -62,7 +68,7 @@ function CreateReport({ auth }) {
                                 <div className="card-header">
                                     <h3 className="card-title">Form Pengaduan Laporan</h3>
                                 </div>
-                                <form onSubmit={storeReport}>
+                                <form onSubmit={storeReport} encType="multipart/form-data">
                                     <div className="card-body">
                                         <div className="form-group">
                                             <label>Nama Pelapor</label>
@@ -125,6 +131,18 @@ function CreateReport({ auth }) {
                                             {errors.description && (
                                                 <div className="text-danger">{errors.description}</div>
                                             )}
+                                        </div>
+                                        {/* Tambah upload file */}
+                                        <div className="form-group">
+                                            <label>Upload Gambar (opsional)</label>
+                                            <input
+                                                type="file"
+                                                className="form-control"
+                                                accept="image/*"
+                                                onChange={(e) => setImage(e.target.files[0])}
+                                                disabled={isLoading}
+                                            />
+                                            {errors.image && <div className="text-danger">{errors.image}</div>}
                                         </div>
                                     </div>
                                     <div className="card-footer d-flex justify-content-end">

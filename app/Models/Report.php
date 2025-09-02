@@ -18,6 +18,7 @@ class Report extends Model
         'description',
         'status',
         'note',
+        'image',
         'created_by',
         'updated_by'
     ];
@@ -34,5 +35,11 @@ class Report extends Model
     public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+    public function getImageUrlAttribute()
+    {
+        return $this->image 
+            ? asset('storage/' . $this->image) 
+            : null;
     }
 }

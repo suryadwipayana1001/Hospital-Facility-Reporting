@@ -76,7 +76,7 @@ export default function ReportIndex({ auth, reports, totalReports, filters }) {
                                 <table className="table table-bordered">
                                     <thead>
                                         <tr>
-                                            <th>ID</th>
+                                            <th>No Pengaduan</th>
                                             <th>Nama</th>
                                             <th>Ruangan</th>
                                             <th>Fasilitas</th>

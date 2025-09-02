@@ -126,9 +126,8 @@
     <table>
         <thead>
             <tr>
-                <th style="width: 8%;">ID</th>
+                <th style="width: 8%;">No Pengaduan</th>
                 <th style="width: 18%;">Nama</th>
-                <th style="width: 15%;">Posisi</th>
                 <th style="width: 15%;">Ruangan</th>
                 <th style="width: 15%;">Fasilitas</th>
                 <th style="width: 20%;">Deskripsi</th>
@@ -140,7 +139,6 @@
             <tr>
                 <td>{{ $r->custom_id }}</td>
                 <td>{{ $r->name }}</td>
-                <td>{{ $r->positions }}</td>
                 <td>{{ $r->room }}</td>
                 <td>{{ $r->facility }}</td>
                 <td>{{ $r->description }}</td>

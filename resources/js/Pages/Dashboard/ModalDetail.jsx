@@ -56,6 +56,18 @@ function ModalDetailReport({ show, close, report }) {
                             <td>{report.note || "-"}</td>
                         </tr>
                         <tr>
+                            <th>Gambar</th>
+                            <td>{report.image ? (
+                                <img
+                                src={`/storage/${report.image}`}
+                                alt="Report"
+                                style={{ maxHeight: "200px" }}
+                                />
+                            ) : (
+                                "-"
+                            )}</td>
+                        </tr>
+                        <tr>
                             <th>Dibuat oleh</th>
                             <td>{report.creator?.name || "-"}</td>
                         </tr>

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('description');
             $table->string('status');
             $table->string('note');
+            $table->string('image')->nullable();
             $table->foreignId('created_by')
                   ->constrained('users')
                   ->onDelete('cascade');

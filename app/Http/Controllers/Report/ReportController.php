@@ -7,6 +7,8 @@ use App\Models\Report;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
+
 
 class ReportController extends Controller
 {
@@ -26,45 +28,53 @@ class ReportController extends Controller
 
     public function store(Request $request)
     {
-    $messages = [
-        'required' => ':attribute tidak boleh kosong !',
-    ];
-    $attributes = [
-        'name'        => 'nama',
-        'positions'   => 'posisi',
-        'room'        => 'ruangan',
-        'facility'    => 'fasilitas',
-        'description' => 'deskripsi',
-    ];
-    $request->validate([
-        'name'        => 'required|string|max:255',
-        'positions'   => 'required|string|max:255',
-        'room'        => 'required|string|max:255',
-        'facility'    => 'required|string|max:255',
-        'description' => 'required|string',
-    ],$messages,$attributes);
+        $messages = [
+            'required' => ':attribute tidak boleh kosong !',
+        ];
+        $attributes = [
+            'name'        => 'nama',
+            'positions'   => 'posisi',
+            'room'        => 'ruangan',
+            'facility'    => 'fasilitas',
+            'description' => 'deskripsi',
+            'image'       => 'gambar',
+        ];
 
-    $lastReport = Report::latest('id')->first();
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'positions'   => 'required|string|max:255',
+            'room'        => 'required|string|max:255',
+            'facility'    => 'required|string|max:255',
+            'description' => 'required|string',
+            'image'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ], $messages, $attributes);
 
-    $nextNumber = $lastReport ? ((int) str_replace('NP', '', $lastReport->custom_id)) + 1 : 1;
+        $lastReport = Report::latest('id')->first();
+        $nextNumber = $lastReport ? ((int) str_replace('NP', '', $lastReport->custom_id)) + 1 : 1;
+        $customId = 'NP' . $nextNumber;
 
-    $customId = 'NP' . $nextNumber;
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('reports', 'public');
+        }
 
-    $report = Report::create([
-        'custom_id'   => $customId,
-        'name'        => $request->name,
-        'positions'   => $request->positions,
-        'room'        => $request->room,
-        'facility'    => $request->facility,
-        'description' => $request->description,
-        'status'      => 'Sedang diajukan',
-        'note'        => '',
-        'created_by'  => auth()->id(),
-    ]);
-    event(new \App\Events\ReportCreated($report));
+        $report = Report::create([
+            'custom_id'   => $customId,
+            'name'        => $request->name,
+            'positions'   => $request->positions,
+            'room'        => $request->room,
+            'facility'    => $request->facility,
+            'description' => $request->description,
+            'status'      => 'Sedang diajukan',
+            'note'        => '',
+            'created_by'  => auth()->id(),
+            'image'       => $imagePath,
+        ]);
 
-    return redirect()->route('reports.index')
-        ->with('success', 'Report created successfully.');
+        event(new \App\Events\ReportCreated($report));
+
+        return redirect()->route('reports.index')
+            ->with('success', 'Report created successfully.');
     }
 
     public function show(Report $report)
@@ -94,7 +104,11 @@ class ReportController extends Controller
             'room'        => 'ruangan',
             'facility'    => 'fasilitas',
             'description' => 'deskripsi',
+            'status'      => 'status',
+            'note'        => 'catatan',
+            'image'       => 'gambar',
         ];
+
         $request->validate([
             'name'        => 'required|string|max:255',
             'positions'   => 'required|string|max:255',
@@ -103,11 +117,20 @@ class ReportController extends Controller
             'description' => 'required|string',
             'status'      => 'required|string',
             'note'        => 'nullable|string',
-        ], $messages,$attributes);
+            'image'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ], $messages, $attributes);
 
-        $data = $request->all();
+        $data = $request->only(['name','positions','room','facility','description','status']);
         $data['note'] = $request->note ?? '-';
         $data['updated_by'] = auth()->id();
+
+        if ($request->hasFile('image')) {
+            if ($report->image && Storage::disk('public')->exists($report->image)) {
+                Storage::disk('public')->delete($report->image);
+            }
+            $data['image'] = $request->file('image')->store('reports', 'public');
+        }
+
         $report->update($data);
 
         return redirect()->route('reports.index')

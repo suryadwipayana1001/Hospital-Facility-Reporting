@@ -52,22 +52,18 @@ export default function ReportIndex({ auth, reports: initialReports }) {
                     audio.play().catch(err => console.error("Gagal play sound:", err));
                 }
             });
-    
-        // Init datatable (sekali saja)
         if (window.$) {
             $(function () {
                 $("#example1").DataTable({
                     responsive: true,
                     lengthChange: false,
                     autoWidth: false,
-                    order: [[2, "desc"]] // kolom ke-2 (Tanggal) descending
+                    order: [[0, "desc"]]
                 }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
             });
         } else {
             console.error("jQuery belum dimuat, pastikan sudah dimuat sebelum inisialisasi DataTable.");
         }
-    
-        // cleanup: stop listening supaya gak dobel kalau komponen unmount
         return () => {
             channel.stopListening(".ReportCreated");
         };

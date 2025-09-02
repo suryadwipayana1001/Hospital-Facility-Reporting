@@ -87,7 +87,7 @@ h1 {
 }
 
 .card-primary:not(.card-outline)>.card-header {
-    background-color: var() !important;
+    background-color: var(--blue-color) !important;
 }
 
 .page-item.active .page-link {
