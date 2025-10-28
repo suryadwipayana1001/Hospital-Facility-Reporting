@@ -1,13 +1,13 @@
 import React from "react";
 import Modal from "react-bootstrap/Modal";
 
-function ModalDetailReport({ show, close, report }) {
+function ModalResponse({ show, close, report }) {
     if (!report) return null; 
 
     return (
         <Modal show={show} size="lg" onHide={close}>
             <Modal.Header className="header-modal">
-                <Modal.Title>Detail Pengaduan</Modal.Title>
+                <Modal.Title>Informasi Response</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <table className="table table-bordered">
@@ -15,26 +15,6 @@ function ModalDetailReport({ show, close, report }) {
                         <tr>
                             <th style={{ width: "250px" }}>Nomor Laporan</th>
                             <td>{report.custom_id}</td>
-                        </tr>
-                        <tr>
-                            <th>Nama Pelapor</th>
-                            <td>{report.name}</td>
-                        </tr>
-                        <tr>
-                            <th>Posisi</th>
-                            <td>{report.positions}</td>
-                        </tr>
-                        <tr>
-                            <th>Ruangan</th>
-                            <td>{report.room}</td>
-                        </tr>
-                        <tr>
-                            <th>Fasilitas</th>
-                            <td>{report.facility}</td>
-                        </tr>
-                        <tr>
-                            <th>Deskripsi</th>
-                            <td>{report.description}</td>
                         </tr>
                         <tr>
                             <th>Status</th>
@@ -57,11 +37,11 @@ function ModalDetailReport({ show, close, report }) {
                         </tr>
                         <tr>
                             <th>Foto</th>
-                            <td>{report.image ? (
+                            <td> {report.process_image ? (
                                 <img
-                                src={`/storage/${report.image}`}
-                                alt="Report"
-                                style={{ maxHeight: "200px" }}
+                                    src={`/storage/${report.process_image}`}
+                                    alt="Process"
+                                    style={{ maxHeight: "200px" }}
                                 />
                             ) : (
                                 "-"
@@ -69,11 +49,14 @@ function ModalDetailReport({ show, close, report }) {
                         </tr>
                         <tr>
                             <th>Oleh</th>
-                            <td>{report.creator?.name || "-"}</td>
+                            <td>{report.status === "Sedang diajukan"
+                                ? "-" : report.updater?.username || "-"}</td>
                         </tr>
                         <tr>
-                            <th>Tanggal Dibuat</th>
-                            <td>{new Date(report.created_at).toLocaleString('id-ID', {
+                            <th>Tanggal Response</th>
+                            <td> {report.status === "Sedang diajukan"
+                                ? "-"
+                                : new Date(report.updated_at).toLocaleString('id-ID', {
                                     day: '2-digit',
                                     month: '2-digit',
                                     year: 'numeric',
@@ -94,4 +77,4 @@ function ModalDetailReport({ show, close, report }) {
     );
 }
 
-export default ModalDetailReport;
+export default ModalResponse;

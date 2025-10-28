@@ -4,6 +4,7 @@ import Sidebar from "../../Layouts/Sidebar";
 import Footer from "../../Layouts/Footer";
 import { Inertia } from '@inertiajs/inertia';
 import ModalDetailReport from "./ModalDetail"; 
+import ModalResponse from './ModalResponse';
 
 function Dashboard({ auth, reports, filters }) {
     const [name, setName] = useState(filters?.name || '');
@@ -11,6 +12,7 @@ function Dashboard({ auth, reports, filters }) {
     const [localError, setLocalError] = useState('');
 
     const [showModal, setShowModal] = useState(false);
+    const [showModalResponse, setShowModalResponse] = useState(false);
     const [selectedReport, setSelectedReport] = useState(null);
 
     const handleSubmit = (e) => {
@@ -43,6 +45,12 @@ function Dashboard({ auth, reports, filters }) {
         setSelectedReport(report);
         setShowModal(true);
     };
+
+    const handleResponse = (report) => {
+        setSelectedReport(report);
+        setShowModalResponse(true);
+    };
+
     useEffect(() => {
         const channel = window.Echo.channel("reports")
             .listen(".ReportCreated", (e) => {
@@ -112,12 +120,20 @@ function Dashboard({ auth, reports, filters }) {
                                                              <span>
                                                                 <b>{report.custom_id}</b> - {report.name}
                                                              </span>
-                                                             <button 
-                                                                onClick={() => handleDetail(report)} 
-                                                                className="btn btn-sm btn-info"
-                                                             >
-                                                                Detail
-                                                             </button>
+                                                             <div>
+                                                                <button 
+                                                                    onClick={() => handleResponse(report)} 
+                                                                    className="btn btn-sm btn-secondary mr-2"
+                                                                >
+                                                                    Response
+                                                                </button>
+                                                                <button 
+                                                                    onClick={() => handleDetail(report)} 
+                                                                    className="btn btn-sm btn-info"
+                                                                >
+                                                                    Detail
+                                                                </button>
+                                                             </div>
                                                          </li>                                                       
                                                         ))}
                                                     </ul>
@@ -156,13 +172,16 @@ function Dashboard({ auth, reports, filters }) {
                     </div>
                 </section>
             </div>
-
             <ModalDetailReport 
                 show={showModal} 
                 close={() => setShowModal(false) } 
                 report={selectedReport} 
             />
-
+             <ModalResponse 
+                show={showModalResponse} 
+                close={() => setShowModalResponse(false) } 
+                report={selectedReport} 
+            />
             <Footer />
         </>
     );

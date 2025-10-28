@@ -5,7 +5,7 @@ import Sidebar from '../../Layouts/Sidebar';
 import Footer from '../../Layouts/Footer';
 import { Inertia } from '@inertiajs/inertia';
 
-function ShowReport({ auth, report }) {
+function Response({ auth, report }) {
     const { errors } = usePage().props;
     useEffect(() => {
         const channel = window.Echo.channel("reports")
@@ -28,7 +28,7 @@ function ShowReport({ auth, report }) {
                     <div className="container-fluid">
                         <div className="row mb-2">
                             <div className="col-sm-6">
-                                <h1>Detail Pengaduan</h1>
+                                <h1>Detail Response</h1>
                             </div>
                         </div>
                     </div>
@@ -39,7 +39,7 @@ function ShowReport({ auth, report }) {
                         <div className="col-md-12">
                             <div className="card card-primary">
                                 <div className="card-header">
-                                    <h3 className="card-title">Informasi Pengaduan</h3>
+                                    <h3 className="card-title">Informasi Response</h3>
                                 </div>
                                 <div className="card-body">
                                     <table className="table table-bordered">
@@ -47,26 +47,6 @@ function ShowReport({ auth, report }) {
                                             <tr>
                                                 <th style={{ width: "250px" }}>Nomor Laporan</th>
                                                 <td>{report.custom_id}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Nama</th>
-                                                <td>{report.name}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Posisi</th>
-                                                <td>{report.positions}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Ruangan</th>
-                                                <td>{report.room}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Fasilitas</th>
-                                                <td>{report.facility}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Deskripsi</th>
-                                                <td>{report.description}</td>
                                             </tr>
                                             <tr>
                                                 <th>Status</th>
@@ -85,30 +65,38 @@ function ShowReport({ auth, report }) {
                                             </tr>
                                             <tr>
                                                 <th>Foto</th>
-                                                <td>{report.image ? (
-                                                    <img
-                                                    src={`/storage/${report.image}`}
-                                                    alt="Report"
-                                                    style={{ maxHeight: "200px" }}
-                                                    />
-                                                ) : (
-                                                    "-"
-                                                )}</td>
+                                                <td>
+                                                    {report.process_image ? (
+                                                        <img
+                                                            src={`/storage/${report.process_image}`}
+                                                            alt="Process"
+                                                            style={{ maxHeight: "200px" }}
+                                                        />
+                                                    ) : (
+                                                        "-"
+                                                    )}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Oleh</th>
-                                                <td>{report.creator?.name || "-"}</td>
+                                                <td>   {report.status === "Sedang diajukan"
+                                                    ? "-" : report.updater?.username || "-"}</td>
                                             </tr>
                                             <tr>
-                                                <th>Tanggal Dibuat</th>
-                                                <td>{new Date(report.created_at).toLocaleString('id-ID', {
-                                                            day: '2-digit',
-                                                            month: '2-digit',
-                                                            year: 'numeric',
-                                                            hour: '2-digit',
-                                                            minute: '2-digit',
-                                                })}</td>
-                                            </tr>
+                                                <th>Tanggal Response</th>
+                                                <td>
+                                                    {report.status === "Sedang diajukan"
+                                                    ? "-"
+                                                    : new Date(report.updated_at).toLocaleString('id-ID', {
+                                                        day: '2-digit',
+                                                        month: '2-digit',
+                                                        year: 'numeric',
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                    })}
+                                                   
+                                                </td>
+                                                </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -130,4 +118,4 @@ function ShowReport({ auth, report }) {
     );
 }
 
-export default ShowReport;
+export default Response;

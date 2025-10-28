@@ -12,25 +12,40 @@ function CreateReport({ auth }) {
     const [room, setRoom] = useState('');
     const [facility, setFacility] = useState('');
     const [description, setDescription] = useState('');
-    const [image, setImage] = useState(null); // ⬅️ tambah state image
+    const [image, setImage] = useState(null);
+    const [localErrors, setLocalErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
 
     const storeReport = (e) => {
         e.preventDefault();
         setIsLoading(true);
 
+        // 🔹 Validasi manual di sisi frontend
+        const newErrors = {};
+        if (!name.trim()) newErrors.name = "Nama pelapor wajib diisi!";
+        if (!positions.trim()) newErrors.positions = "Jabatan wajib diisi!";
+        if (!room.trim()) newErrors.room = "Ruangan wajib diisi!";
+        if (!facility.trim()) newErrors.facility = "Nama barang wajib diisi!";
+        if (!description.trim()) newErrors.description = "Keterangan wajib diisi!";
+        if (!image) newErrors.image = "Foto wajib diunggah!";
+
+        if (Object.keys(newErrors).length > 0) {
+            setLocalErrors(newErrors);
+            setIsLoading(false);
+            return;
+        }
+
+        setLocalErrors({});
         const formData = new FormData();
         formData.append('name', name);
         formData.append('positions', positions);
         formData.append('room', room);
         formData.append('facility', facility);
         formData.append('description', description);
-        if (image) {
-            formData.append('image', image);
-        }
+        formData.append('image', image);
 
         Inertia.post('/reports', formData, {
-            forceFormData: true, // penting supaya inertia kirim multipart/form-data
+            forceFormData: true,
             onFinish: () => setIsLoading(false),
         });
     };
@@ -80,8 +95,10 @@ function CreateReport({ auth }) {
                                                 placeholder="Masukkan Nama"
                                                 disabled={isLoading}
                                             />
+                                            {localErrors.name && <div className="text-danger">{localErrors.name}</div>}
                                             {errors.name && <div className="text-danger">{errors.name}</div>}
                                         </div>
+
                                         <div className="form-group">
                                             <label>Posisi / Jabatan</label>
                                             <input
@@ -92,8 +109,10 @@ function CreateReport({ auth }) {
                                                 placeholder="Masukkan Jabatan"
                                                 disabled={isLoading}
                                             />
+                                            {localErrors.positions && <div className="text-danger">{localErrors.positions}</div>}
                                             {errors.positions && <div className="text-danger">{errors.positions}</div>}
                                         </div>
+
                                         <div className="form-group">
                                             <label>Ruangan</label>
                                             <input
@@ -104,8 +123,10 @@ function CreateReport({ auth }) {
                                                 placeholder="Masukkan Nama Ruangan"
                                                 disabled={isLoading}
                                             />
+                                            {localErrors.room && <div className="text-danger">{localErrors.room}</div>}
                                             {errors.room && <div className="text-danger">{errors.room}</div>}
                                         </div>
+
                                         <div className="form-group">
                                             <label>Nama Barang</label>
                                             <input
@@ -116,8 +137,10 @@ function CreateReport({ auth }) {
                                                 placeholder="Masukkan Nama Barang"
                                                 disabled={isLoading}
                                             />
+                                            {localErrors.facility && <div className="text-danger">{localErrors.facility}</div>}
                                             {errors.facility && <div className="text-danger">{errors.facility}</div>}
                                         </div>
+
                                         <div className="form-group">
                                             <label>Keterangan</label>
                                             <textarea
@@ -128,13 +151,13 @@ function CreateReport({ auth }) {
                                                 placeholder="Masukan keterangan seperti kerusakan yang terjadi"
                                                 disabled={isLoading}
                                             ></textarea>
-                                            {errors.description && (
-                                                <div className="text-danger">{errors.description}</div>
-                                            )}
+                                            {localErrors.description && <div className="text-danger">{localErrors.description}</div>}
+                                            {errors.description && <div className="text-danger">{errors.description}</div>}
                                         </div>
-                                        {/* Tambah upload file */}
+
+                                        {/* Upload file wajib */}
                                         <div className="form-group">
-                                            <label>Upload Gambar (opsional)</label>
+                                            <label>Foto</label>
                                             <input
                                                 type="file"
                                                 className="form-control"
@@ -142,9 +165,11 @@ function CreateReport({ auth }) {
                                                 onChange={(e) => setImage(e.target.files[0])}
                                                 disabled={isLoading}
                                             />
+                                            {localErrors.image && <div className="text-danger">{localErrors.image}</div>}
                                             {errors.image && <div className="text-danger">{errors.image}</div>}
                                         </div>
                                     </div>
+
                                     <div className="card-footer d-flex justify-content-end">
                                         <button 
                                             type="button"
@@ -154,11 +179,16 @@ function CreateReport({ auth }) {
                                         >
                                             Kembali
                                         </button>
-                                        <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                                        <button 
+                                            type="submit" 
+                                            className="btn btn-primary" 
+                                            disabled={isLoading}
+                                        >
                                             {isLoading ? "Mengajukan..." : "Ajukan"}
                                         </button>
                                     </div>
                                 </form>
+
                                 {isLoading && (
                                     <div className="overlay d-flex justify-content-center align-items-center">
                                         <div className="spinner-border text-primary" role="status">

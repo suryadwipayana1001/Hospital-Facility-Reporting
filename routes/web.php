@@ -38,6 +38,8 @@ Route::middleware('auth')->group(function () {
     Route::match(['get','post'], '/dashboard', [\App\Http\Controllers\Dashboard\DashboardController::class, 'index'])->name('dashboard');
     //route report
     Route::resource('reports',\App\Http\Controllers\Report\ReportController::class);
+    Route::get('/reports/{report}/response', [\App\Http\Controllers\Report\ReportController::class, 'response'])
+    ->name('reports.response');
     //route logout
     Route::post('/logout', [\App\Http\Controllers\Auth\LoginController::class, 'destroy']);
 });

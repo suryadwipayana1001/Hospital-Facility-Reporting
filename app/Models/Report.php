@@ -18,6 +18,7 @@ class Report extends Model
         'description',
         'status',
         'note',
+        'process_image',
         'image',
         'created_by',
         'updated_by'
@@ -42,4 +43,10 @@ class Report extends Model
             ? asset('storage/' . $this->image) 
             : null;
     }
+    public function getProcessImageUrlAttribute()
+    {
+    return $this->process_image 
+        ? asset('storage/' . $this->process_image)
+        : null;
+        }
 }

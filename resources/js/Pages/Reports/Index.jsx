@@ -26,6 +26,10 @@ export default function ReportIndex({ auth, reports: initialReports }) {
         Inertia.get(`/reports/${id}`);
     };
 
+    const handleResponse = (id) => {
+        Inertia.get(`/reports/${id}/response`);
+    };    
+
     const deleteReport = (id) => {
         setLoadingDelete(true);
         Inertia.delete(`/reports/${id}`, {
@@ -107,7 +111,7 @@ export default function ReportIndex({ auth, reports: initialReports }) {
                                                     <th>No Pengaduan</th>
                                                     <th>Nama Pelapor</th>
                                                     <th>Fasilitas</th>
-                                                    <th>Tanggal</th>
+                                                    <th>Tanggal Dibuat</th>
                                                     <th>Status</th>
                                                     <th>Action</th>
                                                 </tr>
@@ -118,7 +122,13 @@ export default function ReportIndex({ auth, reports: initialReports }) {
                                                         <td>{report.custom_id}</td>
                                                         <td>{report.name}</td>
                                                         <td>{report.facility}</td>
-                                                        <td>{report.created_at.split("T")[0]}</td>
+                                                        <td>{new Date(report.created_at).toLocaleString('id-ID', {
+                                                            day: '2-digit',
+                                                            month: '2-digit',
+                                                            year: 'numeric',
+                                                            hour: '2-digit',
+                                                            minute: '2-digit',
+                                                        })}</td>
                                                         <td>
                                                             <span className={`badge 
                                                                 ${report.status === "Sedang diajukan" ? "badge-warning" : 
@@ -128,7 +138,10 @@ export default function ReportIndex({ auth, reports: initialReports }) {
                                                             </span>
                                                         </td>
                                                         <td>
-                                                            <button onClick={() => handleDetail(report.id)} className="btn btn-sm btn-info">
+                                                            <button onClick={() => handleResponse(report.id)} className="btn btn-sm btn-secondary">
+                                                                Response
+                                                            </button>
+                                                            <button onClick={() => handleDetail(report.id)} className="btn btn-sm btn-info ml-2">
                                                                 Detail
                                                             </button>
                                                             {auth.user.level === "teknisi" && (

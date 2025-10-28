@@ -85,6 +85,19 @@ class ReportController extends Controller
             'report' => $report,
         ]);
     }
+
+    public function response($id)
+    {
+        $report = \App\Models\Report::with(['creator', 'updater'])->findOrFail($id);
+
+        return inertia('Reports/Response', [
+            'report' => $report,
+            'auth' => [
+                'user' => auth()->user(),
+            ],
+        ]);
+    }
+
     
     public function edit(Report $report)
     {
@@ -98,18 +111,21 @@ class ReportController extends Controller
         $messages = [
             'required' => ':attribute tidak boleh kosong !',
         ];
+
         $attributes = [
-            'name'        => 'nama',
-            'positions'   => 'posisi',
-            'room'        => 'ruangan',
-            'facility'    => 'fasilitas',
-            'description' => 'deskripsi',
-            'status'      => 'status',
-            'note'        => 'catatan',
-            'image'       => 'gambar',
+            'name'          => 'nama',
+            'positions'     => 'posisi',
+            'room'          => 'ruangan',
+            'facility'      => 'fasilitas',
+            'description'   => 'deskripsi',
+            'status'        => 'status',
+            'note'          => 'catatan',
+            'process_image' => 'foto selesai',
+            'image'         => 'foto awal',
         ];
 
-        $request->validate([
+        // 🔹 Buat aturan dasar
+        $rules = [
             'name'        => 'required|string|max:255',
             'positions'   => 'required|string|max:255',
             'room'        => 'required|string|max:255',
@@ -118,12 +134,36 @@ class ReportController extends Controller
             'status'      => 'required|string',
             'note'        => 'nullable|string',
             'image'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ], $messages, $attributes);
+        ];
 
-        $data = $request->only(['name','positions','room','facility','description','status']);
+        // 🔸 Jika status = "Selesai diproses", maka process_image wajib diisi
+      // 🔸 Jika status = "Selesai diproses", maka process_image wajib diisi hanya jika belum ada foto lama
+        if ($request->status === 'Selesai diproses') {
+            if (!$report->process_image) {
+                $rules['process_image'] = 'required|image|mimes:jpg,jpeg,png|max:2048';
+            } else {
+                $rules['process_image'] = 'nullable|image|mimes:jpg,jpeg,png|max:2048';
+            }
+        } else {
+            $rules['process_image'] = 'nullable|image|mimes:jpg,jpeg,png|max:2048';
+        }
+
+
+        $request->validate($rules, $messages, $attributes);
+
+        $data = $request->only(['name', 'positions', 'room', 'facility', 'description', 'status']);
         $data['note'] = $request->note ?? '-';
         $data['updated_by'] = auth()->id();
 
+        // 🔹 Upload foto selesai
+        if ($request->hasFile('process_image')) {
+            if ($report->process_image && Storage::disk('public')->exists($report->process_image)) {
+                Storage::disk('public')->delete($report->process_image);
+            }
+            $data['process_image'] = $request->file('process_image')->store('reports/process', 'public');
+        }
+
+        // 🔹 Upload foto awal (jika diubah)
         if ($request->hasFile('image')) {
             if ($report->image && Storage::disk('public')->exists($report->image)) {
                 Storage::disk('public')->delete($report->image);
@@ -148,6 +188,7 @@ class ReportController extends Controller
     {
         $startDate = $request->input('start_date');
         $endDate   = $request->input('end_date');
+        $status    = $request->input('status');
 
         $query = Report::query();
 
@@ -156,6 +197,10 @@ class ReportController extends Controller
                 Carbon::parse($startDate)->startOfDay(),
                 Carbon::parse($endDate)->endOfDay(),
             ]);
+        }
+
+        if ($status) {
+            $query->where('status', $status);
         }
 
         $reports = $query->latest()->get();
@@ -167,40 +212,47 @@ class ReportController extends Controller
             'filters'      => [
                 'start_date' => $startDate,
                 'end_date'   => $endDate,
+                'status'     => $status,
             ],
         ]);
     }
 
     public function exportPdf(Request $request)
     {
-        $startDate = $request->input('start_date');
-        $endDate   = $request->input('end_date');
+    $startDate = $request->input('start_date');
+    $endDate   = $request->input('end_date');
+    $status    = $request->input('status');
 
-        $query = Report::query();
+    $query = Report::query();
 
-        if ($startDate && $endDate) {
-            $query->whereBetween('created_at', [
-                \Carbon\Carbon::parse($startDate)->startOfDay(),
-                \Carbon\Carbon::parse($endDate)->endOfDay()
-            ]);
-        }
-
-        $reports = $query->latest()->get();
-
-        $totals = [
-            'diajukan'  => $reports->where('status', 'Sedang diajukan')->count(),
-            'diproses'  => $reports->where('status', 'Sedang diproses')->count(),
-            'selesai'   => $reports->where('status', 'Selesai diproses')->count(),
-            'total'     => $reports->count(),
-        ];
-
-        $pdf = Pdf::loadView('pdf.reports', [
-            'reports' => $reports,
-            'totals'  => $totals,
-            'startDate' => $startDate,
-            'endDate' => $endDate,
+    if ($startDate && $endDate) {
+        $query->whereBetween('created_at', [
+            Carbon::parse($startDate)->startOfDay(),
+            Carbon::parse($endDate)->endOfDay(),
         ]);
+    }
 
-        return $pdf->download('laporan-kerusakan.pdf');
+    if ($status) {
+        $query->where('status', $status);
+    }
+
+    $reports = $query->latest()->get();
+
+    $totals = [
+        'diajukan'  => $reports->where('status', 'Sedang diajukan')->count(),
+        'diproses'  => $reports->where('status', 'Sedang diproses')->count(),
+        'selesai'   => $reports->where('status', 'Selesai diproses')->count(),
+        'total'     => $reports->count(),
+    ];
+
+    $pdf = Pdf::loadView('pdf.reports', [
+        'reports' => $reports,
+        'totals'  => $totals,
+        'startDate' => $startDate,
+        'endDate' => $endDate,
+        'status' => $status,
+    ]);
+
+    return $pdf->download('laporan-kerusakan.pdf');
     }
 }

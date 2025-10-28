@@ -103,22 +103,48 @@
     <div>
         <strong>Ringkasan Status:</strong>
         <table class="rekap">
-            <tr class="diajukan">
-                <td>Sedang diajukan</td>
-                <td style="text-align:center;">{{ $totals['diajukan'] }}</td>
-            </tr>
-            <tr class="diproses">
-                <td>Sedang diproses</td>
-                <td style="text-align:center;">{{ $totals['diproses'] }}</td>
-            </tr>
-            <tr class="selesai">
-                <td>Selesai diproses</td>
-                <td style="text-align:center;">{{ $totals['selesai'] }}</td>
-            </tr>
-            <tr class="total">
-                <td>Total Laporan</td>
-                <td style="text-align:center;">{{ $totals['total'] }}</td>
-            </tr>
+            @if (empty($status))
+                {{-- 🔹 Tampilkan semua status jika tidak difilter --}}
+                <tr class="diajukan">
+                    <td>Sedang diajukan</td>
+                    <td style="text-align:center;">{{ $totals['diajukan'] }}</td>
+                </tr>
+                <tr class="diproses">
+                    <td>Sedang diproses</td>
+                    <td style="text-align:center;">{{ $totals['diproses'] }}</td>
+                </tr>
+                <tr class="selesai">
+                    <td>Selesai diproses</td>
+                    <td style="text-align:center;">{{ $totals['selesai'] }}</td>
+                </tr>
+                <tr class="total">
+                    <td><strong>Total Laporan</strong></td>
+                    <td style="text-align:center;"><strong>{{ $totals['total'] }}</strong></td>
+                </tr>
+            @else
+                {{-- 🔸 Jika difilter, hanya tampil status yang dipilih + total --}}
+                @if ($status === 'Sedang diajukan')
+                    <tr class="diajukan">
+                        <td>Sedang diajukan</td>
+                        <td style="text-align:center;">{{ $totals['diajukan'] }}</td>
+                    </tr>
+                @elseif ($status === 'Sedang diproses')
+                    <tr class="diproses">
+                        <td>Sedang diproses</td>
+                        <td style="text-align:center;">{{ $totals['diproses'] }}</td>
+                    </tr>
+                @elseif ($status === 'Selesai diproses')
+                    <tr class="selesai">
+                        <td>Selesai diproses</td>
+                        <td style="text-align:center;">{{ $totals['selesai'] }}</td>
+                    </tr>
+                @endif
+
+                <tr class="total">
+                    <td><strong>Total Laporan</strong></td>
+                    <td style="text-align:center;"><strong>{{ $totals['total'] }}</strong></td>
+                </tr>
+            @endif
         </table>
     </div>
 
@@ -132,6 +158,8 @@
                 <th style="width: 15%;">Fasilitas</th>
                 <th style="width: 20%;">Deskripsi</th>
                 <th style="width: 9%;">Status</th>
+                <th style="width: 15%;">Tanggal Dibuat</th>
+                <th style="width: 15%;">Tanggal Response</th>
             </tr>
         </thead>
         <tbody>
@@ -143,6 +171,8 @@
                 <td>{{ $r->facility }}</td>
                 <td>{{ $r->description }}</td>
                 <td>{{ $r->status }}</td>
+                <td>{{ \Carbon\Carbon::parse($r->created_at)->timezone('Asia/Makassar')->format('d/m/Y H:i') }}</td>
+                <td>{{ \Carbon\Carbon::parse($r->updated_at)->timezone('Asia/Makassar')->format('d/m/Y H:i') }}</td>
             </tr>
             @empty
             <tr>
@@ -151,7 +181,6 @@
             @endforelse
         </tbody>
     </table>
-
     <div class="footer">
         &copy; {{ date('Y') }} Rumah Sakit Windu Husada - Sistem Pelaporan Kerusakan
     </div>
