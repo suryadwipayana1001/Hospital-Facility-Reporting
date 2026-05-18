@@ -4,6 +4,8 @@ import Header from '../../Layouts/Header';
 import Sidebar from '../../Layouts/Sidebar';
 import Footer from '../../Layouts/Footer';
 import { Inertia } from '@inertiajs/inertia';
+import ImageZoom from '../../Component/ImageZoom';
+import HistoryTimeline from '../../Component/HistoryTimeline';
 
 function Response({ auth, report }) {
     const { errors } = usePage().props;
@@ -67,9 +69,9 @@ function Response({ auth, report }) {
                                                 <th>Foto</th>
                                                 <td>
                                                     {report.process_image ? (
-                                                        <img
+                                                        <ImageZoom
                                                             src={`/storage/${report.process_image}`}
-                                                            alt="Process"
+                                                            alt="Foto Selesai Proses"
                                                             style={{ maxHeight: "200px" }}
                                                         />
                                                     ) : (
@@ -109,6 +111,9 @@ function Response({ auth, report }) {
                                 </button>
                                 </div>
                             </div>
+
+                            {/* Timeline Riwayat Aktivitas */}
+                            <HistoryTimeline histories={report.histories} />
                         </div>
                     </div>
                 </section>

@@ -4,6 +4,7 @@ import { Inertia } from "@inertiajs/inertia";
 import Header from "../../Layouts/Header";
 import Sidebar from "../../Layouts/Sidebar";
 import Footer from "../../Layouts/Footer";
+import ImageZoom from "../../Component/ImageZoom";
 
 function EditReport({ auth, report }) {
   const { errors } = usePage().props;
@@ -12,6 +13,7 @@ function EditReport({ auth, report }) {
   const [positions, setPositions] = useState(report.positions);
   const [room, setRoom] = useState(report.room);
   const [facility, setFacility] = useState(report.facility);
+  const [category, setCategory] = useState(report.category ?? "");
   const [description, setDescription] = useState(report.description);
   const [status, setStatus] = useState(report.status ?? "Sedang diajukan");
   const [note, setNote] = useState(report.note ?? "");
@@ -31,6 +33,7 @@ function EditReport({ auth, report }) {
     if (!positions.trim()) newErrors.positions = "Jabatan tidak boleh kosong!";
     if (!room.trim()) newErrors.room = "Ruangan tidak boleh kosong!";
     if (!facility.trim()) newErrors.facility = "Fasilitas tidak boleh kosong!";
+    if (!category) newErrors.category = "Kategori tidak boleh kosong!";
     if (!description.trim()) newErrors.description = "Deskripsi tidak boleh kosong!";
     if (!status.trim()) newErrors.status = "Status tidak boleh kosong!";
   
@@ -62,6 +65,7 @@ function EditReport({ auth, report }) {
     formData.append("positions", positions);
     formData.append("room", room);
     formData.append("facility", facility);
+    formData.append("category", category);
     formData.append("description", description);
     formData.append("status", status);
     formData.append("note", note);
@@ -112,6 +116,22 @@ function EditReport({ auth, report }) {
                   <h3 className="card-title">Form Ubah Laporan</h3>
                 </div>
                 <div className="card-body">
+                  {/* Kategori */}
+                  <div className="form-group">
+                    <label>Kategori</label>
+                    <select
+                      className="form-control"
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                    >
+                      <option value="">-- Pilih Kategori --</option>
+                      <option value="IT">IT (Teknologi Informasi)</option>
+                      <option value="IPSRS">IPSRS (Instalasi Pemeliharaan Sarana Rumah Sakit)</option>
+                    </select>
+                    {localErrors.category && <div className="text-danger">{localErrors.category}</div>}
+                    {errors.category && <div className="text-danger">{errors.category}</div>}
+                  </div>
+
                   {/* Status */}
                   <div className="form-group">
                     <label>Status</label>
@@ -160,9 +180,9 @@ function EditReport({ auth, report }) {
                     {report.process_image && (
                         <div className="mt-2">
                         <p>Foto saat ini:</p>
-                        <img
+                        <ImageZoom
                             src={`/storage/${report.process_image}`}
-                            alt="Process"
+                            alt="Foto Selesai Proses Saat Ini"
                             style={{ maxHeight: "200px" }}
                         />
                         </div>

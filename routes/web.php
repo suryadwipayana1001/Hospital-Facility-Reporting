@@ -23,15 +23,19 @@ Route::post('/login', [\App\Http\Controllers\Auth\LoginController::class, 'store
 //middleware auth and user role
 
 //middlware auth
-Route::middleware(['auth', 'role:teknisi'])->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
     //route index register
     Route::get('/register', [\App\Http\Controllers\Auth\RegisterController::class, 'index']);
     Route::post('/register', [\App\Http\Controllers\Auth\RegisterController::class, 'store']);
     //route user
     Route::resource('/user', \App\Http\Controllers\Auth\UserController::class);
+});
+
+Route::middleware(['auth', 'role:admin,teknisi'])->group(function () {
     // route report file
     Route::get('/reports-file', [\App\Http\Controllers\Report\ReportController::class, 'report'])->name('reports.report');
     Route::get('/reports-file/export', [\App\Http\Controllers\Report\ReportController::class, 'exportPdf'])->name('reports.export');
+    Route::get('/reports-file/export-excel', [\App\Http\Controllers\Report\ReportController::class, 'exportExcel'])->name('reports.export-excel');
 });
 Route::middleware('auth')->group(function () {
     //route dashboard

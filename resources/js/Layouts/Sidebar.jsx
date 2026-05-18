@@ -30,21 +30,21 @@ const Sidebar = (props) => {
                                 <p>Pengaduan</p>
                             </a>
                         </li>
-                        {level === "teknisi" && (
-                            <>
-                                <li className="nav-item">
-                                    <a href="/reports-file" className={props.active === 'reports-file' ? "nav-link active" : 'nav-link'}>
-                                        <i className="nav-icon fas fa-file"></i>
-                                        <p>Laporan</p>
-                                    </a>
-                                </li>
-                                <li className="nav-item">
-                                    <a href="/user" className={props.active === 'user' ? "nav-link active" : 'nav-link'}>
-                                        <i className="nav-icon fas fa-users"></i>
-                                        <p>Akun</p>
-                                    </a>
-                                </li>
-                            </>
+                        {(level === "admin" || level === "teknisi") && (
+                            <li className="nav-item">
+                                <a href="/reports-file" className={props.active === 'reports-file' ? "nav-link active" : 'nav-link'}>
+                                    <i className="nav-icon fas fa-file"></i>
+                                    <p>Laporan</p>
+                                </a>
+                            </li>
+                        )}
+                        {level === "admin" && (
+                            <li className="nav-item">
+                                <a href="/user" className={props.active === 'user' ? "nav-link active" : 'nav-link'}>
+                                    <i className="nav-icon fas fa-users"></i>
+                                    <p>Akun</p>
+                                </a>
+                            </li>
                         )}
                     </ul>
                 </nav>

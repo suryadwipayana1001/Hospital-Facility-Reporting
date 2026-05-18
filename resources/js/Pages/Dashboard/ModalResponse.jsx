@@ -1,5 +1,7 @@
 import React from "react";
 import Modal from "react-bootstrap/Modal";
+import ImageZoom from "../../Component/ImageZoom";
+import HistoryTimeline from "../../Component/HistoryTimeline";
 
 function ModalResponse({ show, close, report }) {
     if (!report) return null; 
@@ -38,9 +40,9 @@ function ModalResponse({ show, close, report }) {
                         <tr>
                             <th>Foto</th>
                             <td> {report.process_image ? (
-                                <img
+                                <ImageZoom
                                     src={`/storage/${report.process_image}`}
-                                    alt="Process"
+                                    alt="Foto Selesai Proses"
                                     style={{ maxHeight: "200px" }}
                                 />
                             ) : (
@@ -67,6 +69,9 @@ function ModalResponse({ show, close, report }) {
                         </tr>
                     </tbody>
                 </table>
+
+                {/* Timeline Riwayat Aktivitas */}
+                <HistoryTimeline histories={report.histories} />
             </Modal.Body>
             <Modal.Footer>
                 <button className="btn btn-red" onClick={close}>

@@ -153,13 +153,15 @@
         <thead>
             <tr>
                 <th style="width: 8%;">No Pengaduan</th>
-                <th style="width: 18%;">Nama</th>
-                <th style="width: 15%;">Ruangan</th>
-                <th style="width: 15%;">Fasilitas</th>
-                <th style="width: 20%;">Deskripsi</th>
-                <th style="width: 9%;">Status</th>
-                <th style="width: 15%;">Tanggal Dibuat</th>
-                <th style="width: 15%;">Tanggal Response</th>
+                <th style="width: 12%;">Nama</th>
+                <th style="width: 8%;">Kategori</th>
+                <th style="width: 12%;">Ruangan</th>
+                <th style="width: 12%;">Fasilitas</th>
+                <th style="width: 16%;">Deskripsi</th>
+                <th style="width: 8%;">Status</th>
+                <th style="width: 12%;">Tanggal Buat</th>
+                <th style="width: 12%;">Tanggal Proses</th>
+                <th style="width: 12%;">Tanggal Selesai</th>
             </tr>
         </thead>
         <tbody>
@@ -167,16 +169,18 @@
             <tr>
                 <td>{{ $r->custom_id }}</td>
                 <td>{{ $r->name }}</td>
+                <td>{{ $r->category ?? '-' }}</td>
                 <td>{{ $r->room }}</td>
                 <td>{{ $r->facility }}</td>
                 <td>{{ $r->description }}</td>
                 <td>{{ $r->status }}</td>
                 <td>{{ \Carbon\Carbon::parse($r->created_at)->timezone('Asia/Makassar')->format('d/m/Y H:i') }}</td>
-                <td>{{ \Carbon\Carbon::parse($r->updated_at)->timezone('Asia/Makassar')->format('d/m/Y H:i') }}</td>
+                <td>{{ $r->processed_at ? \Carbon\Carbon::parse($r->processed_at)->timezone('Asia/Makassar')->format('d/m/Y H:i') : '-' }}</td>
+                <td>{{ $r->completed_at ? \Carbon\Carbon::parse($r->completed_at)->timezone('Asia/Makassar')->format('d/m/Y H:i') : '-' }}</td>
             </tr>
             @empty
             <tr>
-                <td colspan="7" style="text-align:center; padding:10px;">Tidak ada data laporan</td>
+                <td colspan="10" style="text-align:center; padding:10px;">Tidak ada data laporan</td>
             </tr>
             @endforelse
         </tbody>

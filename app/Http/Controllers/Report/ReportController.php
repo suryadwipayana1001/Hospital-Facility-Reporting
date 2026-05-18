@@ -14,7 +14,7 @@ class ReportController extends Controller
 {
     public function index()
     {
-        $reports = Report::with('user')->latest()->get();;
+        $reports = Report::with('user')->orderBy('id', 'desc')->get();
 
         return Inertia::render('Reports/Index', [
             'reports' => $reports,
@@ -36,6 +36,7 @@ class ReportController extends Controller
             'positions'   => 'posisi',
             'room'        => 'ruangan',
             'facility'    => 'fasilitas',
+            'category'    => 'kategori',
             'description' => 'deskripsi',
             'image'       => 'gambar',
         ];
@@ -45,6 +46,7 @@ class ReportController extends Controller
             'positions'   => 'required|string|max:255',
             'room'        => 'required|string|max:255',
             'facility'    => 'required|string|max:255',
+            'category'    => 'required|string|in:IT,IPSRS',
             'description' => 'required|string',
             'image'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ], $messages, $attributes);
@@ -64,11 +66,20 @@ class ReportController extends Controller
             'positions'   => $request->positions,
             'room'        => $request->room,
             'facility'    => $request->facility,
+            'category'    => $request->category,
             'description' => $request->description,
             'status'      => 'Sedang diajukan',
             'note'        => '',
             'created_by'  => auth()->id(),
             'image'       => $imagePath,
+        ]);
+
+        // Simpan riwayat awal diajukan
+        $report->histories()->create([
+            'user_id' => auth()->id(),
+            'status'  => 'Sedang diajukan',
+            'note'    => $request->description,
+            'image'   => $imagePath,
         ]);
 
         event(new \App\Events\ReportCreated($report));
@@ -79,7 +90,7 @@ class ReportController extends Controller
 
     public function show(Report $report)
     {
-        $report->load(['creator', 'updater']); 
+        $report->load(['creator', 'updater', 'histories.user']); 
     
         return Inertia::render('Reports/Show', [
             'report' => $report,
@@ -88,7 +99,7 @@ class ReportController extends Controller
 
     public function response($id)
     {
-        $report = \App\Models\Report::with(['creator', 'updater'])->findOrFail($id);
+        $report = \App\Models\Report::with(['creator', 'updater', 'histories.user'])->findOrFail($id);
 
         return inertia('Reports/Response', [
             'report' => $report,
@@ -117,6 +128,7 @@ class ReportController extends Controller
             'positions'     => 'posisi',
             'room'          => 'ruangan',
             'facility'      => 'fasilitas',
+            'category'      => 'kategori',
             'description'   => 'deskripsi',
             'status'        => 'status',
             'note'          => 'catatan',
@@ -130,6 +142,7 @@ class ReportController extends Controller
             'positions'   => 'required|string|max:255',
             'room'        => 'required|string|max:255',
             'facility'    => 'required|string|max:255',
+            'category'    => 'required|string|in:IT,IPSRS',
             'description' => 'required|string',
             'status'      => 'required|string',
             'note'        => 'nullable|string',
@@ -137,7 +150,7 @@ class ReportController extends Controller
         ];
 
         // 🔸 Jika status = "Selesai diproses", maka process_image wajib diisi
-      // 🔸 Jika status = "Selesai diproses", maka process_image wajib diisi hanya jika belum ada foto lama
+       // 🔸 Jika status = "Selesai diproses", maka process_image wajib diisi hanya jika belum ada foto lama
         if ($request->status === 'Selesai diproses') {
             if (!$report->process_image) {
                 $rules['process_image'] = 'required|image|mimes:jpg,jpeg,png|max:2048';
@@ -151,9 +164,23 @@ class ReportController extends Controller
 
         $request->validate($rules, $messages, $attributes);
 
-        $data = $request->only(['name', 'positions', 'room', 'facility', 'description', 'status']);
+        $data = $request->only(['name', 'positions', 'room', 'facility', 'category', 'description', 'status']);
         $data['note'] = $request->note ?? '-';
         $data['updated_by'] = auth()->id();
+
+        // 🔹 Otomatis catat waktu proses dan selesai berdasarkan perubahan status
+        if ($request->status === 'Sedang diproses') {
+            if (!$report->processed_at) {
+                $data['processed_at'] = now();
+            }
+        } elseif ($request->status === 'Selesai diproses') {
+            if (!$report->processed_at) {
+                $data['processed_at'] = now();
+            }
+            if (!$report->completed_at) {
+                $data['completed_at'] = now();
+            }
+        }
 
         // 🔹 Upload foto selesai
         if ($request->hasFile('process_image')) {
@@ -172,6 +199,14 @@ class ReportController extends Controller
         }
 
         $report->update($data);
+
+        // Simpan riwayat perubahan baru (update status, catatan, foto proses)
+        $report->histories()->create([
+            'user_id' => auth()->id(),
+            'status'  => $request->status,
+            'note'    => $request->note ?? '-',
+            'image'   => isset($data['process_image']) ? $data['process_image'] : null,
+        ]);
 
         return redirect()->route('reports.index')
             ->with('success', 'Report updated successfully.');
@@ -203,7 +238,7 @@ class ReportController extends Controller
             $query->where('status', $status);
         }
 
-        $reports = $query->latest()->get();
+        $reports = $query->orderBy('id', 'desc')->get();
         $totalReports = $reports->count();
 
         return Inertia::render('Reports/ReportIndex', [
@@ -236,7 +271,7 @@ class ReportController extends Controller
         $query->where('status', $status);
     }
 
-    $reports = $query->latest()->get();
+    $reports = $query->orderBy('id', 'desc')->get();
 
     $totals = [
         'diajukan'  => $reports->where('status', 'Sedang diajukan')->count(),
@@ -251,8 +286,54 @@ class ReportController extends Controller
         'startDate' => $startDate,
         'endDate' => $endDate,
         'status' => $status,
-    ]);
+    ])->setPaper('a4', 'landscape');
 
     return $pdf->download('laporan-kerusakan.pdf');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $startDate = $request->input('start_date');
+        $endDate   = $request->input('end_date');
+        $status    = $request->input('status');
+
+        $query = Report::query();
+
+        if ($startDate && $endDate) {
+            $query->whereBetween('created_at', [
+                Carbon::parse($startDate)->startOfDay(),
+                Carbon::parse($endDate)->endOfDay(),
+            ]);
+        }
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $reports = $query->orderBy('id', 'desc')->get();
+
+        $totals = [
+            'diajukan'  => $reports->where('status', 'Sedang diajukan')->count(),
+            'diproses'  => $reports->where('status', 'Sedang diproses')->count(),
+            'selesai'   => $reports->where('status', 'Selesai diproses')->count(),
+            'total'     => $reports->count(),
+        ];
+
+        $filename = 'laporan-kerusakan-' . date('Ymd-His') . '.xls';
+
+        // Menambahkan UTF-8 BOM agar Excel mengenali karakter khusus (Unicode/UTF-8) dengan benar
+        $content = "\xEF\xBB\xBF" . view('excel.reports', [
+            'reports'   => $reports,
+            'totals'    => $totals,
+            'startDate' => $startDate,
+            'endDate'   => $endDate,
+            'status'    => $status,
+        ])->render();
+
+        return response($content)
+            ->header('Content-Type', 'application/vnd.ms-excel; charset=utf-8')
+            ->header('Content-Disposition', "attachment; filename=\"$filename\"")
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 }

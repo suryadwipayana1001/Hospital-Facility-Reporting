@@ -1,8 +1,21 @@
 import React from "react";
 import Modal from "react-bootstrap/Modal";
+import ImageZoom from "../../Component/ImageZoom";
+import HistoryTimeline from "../../Component/HistoryTimeline";
 
 function ModalDetailReport({ show, close, report }) {
     if (!report) return null; 
+
+    const formatDateTime = (dateStr) => {
+        if (!dateStr) return '-';
+        return new Date(dateStr).toLocaleString('id-ID', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        }).replace(/\./g, ':');
+    };
 
     return (
         <Modal show={show} size="lg" onHide={close}>
@@ -33,6 +46,14 @@ function ModalDetailReport({ show, close, report }) {
                             <td>{report.facility}</td>
                         </tr>
                         <tr>
+                            <th>Kategori</th>
+                            <td>
+                                <span className="badge text-white" style={{ backgroundColor: report.category === 'IT' ? '#3498db' : '#e67e22', fontSize: '11.5px', padding: '5px 8px', borderRadius: '4px' }}>
+                                    {report.category || '-'}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
                             <th>Deskripsi</th>
                             <td>{report.description}</td>
                         </tr>
@@ -58,9 +79,9 @@ function ModalDetailReport({ show, close, report }) {
                         <tr>
                             <th>Foto</th>
                             <td>{report.image ? (
-                                <img
+                                <ImageZoom
                                 src={`/storage/${report.image}`}
-                                alt="Report"
+                                alt="Foto Pengaduan"
                                 style={{ maxHeight: "200px" }}
                                 />
                             ) : (
@@ -72,18 +93,22 @@ function ModalDetailReport({ show, close, report }) {
                             <td>{report.creator?.name || "-"}</td>
                         </tr>
                         <tr>
-                            <th>Tanggal Dibuat</th>
-                            <td>{new Date(report.created_at).toLocaleString('id-ID', {
-                                    day: '2-digit',
-                                    month: '2-digit',
-                                    year: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                })}
-                            </td>
+                            <th>Tanggal Buat</th>
+                            <td>{formatDateTime(report.created_at)}</td>
+                        </tr>
+                        <tr>
+                            <th>Tanggal Proses</th>
+                            <td>{formatDateTime(report.processed_at)}</td>
+                        </tr>
+                        <tr>
+                            <th>Tanggal Selesai</th>
+                            <td>{formatDateTime(report.completed_at)}</td>
                         </tr>
                     </tbody>
                 </table>
+
+                {/* Timeline Riwayat Aktivitas */}
+                <HistoryTimeline histories={report.histories} />
             </Modal.Body>
             <Modal.Footer>
                 <button className="btn btn-red" onClick={close}>

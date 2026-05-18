@@ -4,9 +4,21 @@ import Header from '../../Layouts/Header';
 import Sidebar from '../../Layouts/Sidebar';
 import Footer from '../../Layouts/Footer';
 import { Inertia } from '@inertiajs/inertia';
+import ImageZoom from '../../Component/ImageZoom';
+import HistoryTimeline from '../../Component/HistoryTimeline';
 
 function ShowReport({ auth, report }) {
     const { errors } = usePage().props;
+    const formatDateTime = (dateStr) => {
+        if (!dateStr) return '-';
+        return new Date(dateStr).toLocaleString('id-ID', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        }).replace(/\./g, ':');
+    };
     useEffect(() => {
         const channel = window.Echo.channel("reports")
             .listen(".ReportCreated", (e) => {
@@ -65,6 +77,14 @@ function ShowReport({ auth, report }) {
                                                 <td>{report.facility}</td>
                                             </tr>
                                             <tr>
+                                                <th>Kategori</th>
+                                                <td>
+                                                    <span className="badge text-white" style={{ backgroundColor: report.category === 'IT' ? '#3498db' : '#e67e22', fontSize: '11.5px', padding: '5px 8px', borderRadius: '4px' }}>
+                                                        {report.category || '-'}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
                                                 <th>Deskripsi</th>
                                                 <td>{report.description}</td>
                                             </tr>
@@ -86,9 +106,9 @@ function ShowReport({ auth, report }) {
                                             <tr>
                                                 <th>Foto</th>
                                                 <td>{report.image ? (
-                                                    <img
+                                                    <ImageZoom
                                                     src={`/storage/${report.image}`}
-                                                    alt="Report"
+                                                    alt="Foto Pengaduan"
                                                     style={{ maxHeight: "200px" }}
                                                     />
                                                 ) : (
@@ -100,14 +120,16 @@ function ShowReport({ auth, report }) {
                                                 <td>{report.creator?.name || "-"}</td>
                                             </tr>
                                             <tr>
-                                                <th>Tanggal Dibuat</th>
-                                                <td>{new Date(report.created_at).toLocaleString('id-ID', {
-                                                            day: '2-digit',
-                                                            month: '2-digit',
-                                                            year: 'numeric',
-                                                            hour: '2-digit',
-                                                            minute: '2-digit',
-                                                })}</td>
+                                                <th>Tanggal Buat</th>
+                                                <td>{formatDateTime(report.created_at)}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Tanggal Proses</th>
+                                                <td>{formatDateTime(report.processed_at)}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Tanggal Selesai</th>
+                                                <td>{formatDateTime(report.completed_at)}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -121,6 +143,9 @@ function ShowReport({ auth, report }) {
                                 </button>
                                 </div>
                             </div>
+
+                            {/* Timeline Riwayat Aktivitas */}
+                            <HistoryTimeline histories={report.histories} />
                         </div>
                     </div>
                 </section>

@@ -25,7 +25,7 @@ class Kernel extends HttpKernel
 
     protected $routeMiddleware = [
         // bawaan Laravel...
-        'role' => \App\Http\Middleware\RoleMiddleware::class,
+        'role' => \App\Http\Middleware\CheckUserRole::class,
     ];
 
     /**

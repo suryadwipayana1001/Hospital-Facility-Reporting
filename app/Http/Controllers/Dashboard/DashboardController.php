@@ -17,14 +17,14 @@ class DashboardController extends Controller
 
         if ($request->isMethod('post') && $name) {
             $reports = Report::query()
-                ->with(['creator', 'updater']) 
+                ->with(['creator', 'updater', 'histories.user']) 
                 ->where('name', 'like', "%{$name}%")
-                ->latest()
+                ->orderBy('id', 'desc')
                 ->paginate(5);
         } else {
             $reports = Report::query()
-                ->with(['creator', 'updater'])
-                ->latest()
+                ->with(['creator', 'updater', 'histories.user'])
+                ->orderBy('id', 'desc')
                 ->paginate(5);
         }
 

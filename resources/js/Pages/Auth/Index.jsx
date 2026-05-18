@@ -51,6 +51,7 @@ export default function AuthIndex({ auth, users }) {
                     "responsive": true,
                     "lengthChange": false,
                     "autoWidth": false,
+                    "stateSave": true,
                 }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
                 $('#example2').DataTable({
                     "paging": true,

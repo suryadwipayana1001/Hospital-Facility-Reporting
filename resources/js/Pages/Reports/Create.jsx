@@ -11,6 +11,7 @@ function CreateReport({ auth }) {
     const [positions, setPositions] = useState('');
     const [room, setRoom] = useState('');
     const [facility, setFacility] = useState('');
+    const [category, setCategory] = useState('');
     const [description, setDescription] = useState('');
     const [image, setImage] = useState(null);
     const [localErrors, setLocalErrors] = useState({});
@@ -26,6 +27,7 @@ function CreateReport({ auth }) {
         if (!positions.trim()) newErrors.positions = "Jabatan wajib diisi!";
         if (!room.trim()) newErrors.room = "Ruangan wajib diisi!";
         if (!facility.trim()) newErrors.facility = "Nama barang wajib diisi!";
+        if (!category) newErrors.category = "Kategori wajib dipilih!";
         if (!description.trim()) newErrors.description = "Keterangan wajib diisi!";
         if (!image) newErrors.image = "Foto wajib diunggah!";
 
@@ -41,6 +43,7 @@ function CreateReport({ auth }) {
         formData.append('positions', positions);
         formData.append('room', room);
         formData.append('facility', facility);
+        formData.append('category', category);
         formData.append('description', description);
         formData.append('image', image);
 
@@ -139,6 +142,22 @@ function CreateReport({ auth }) {
                                             />
                                             {localErrors.facility && <div className="text-danger">{localErrors.facility}</div>}
                                             {errors.facility && <div className="text-danger">{errors.facility}</div>}
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Kategori</label>
+                                            <select
+                                                className="form-control"
+                                                value={category}
+                                                onChange={(e) => setCategory(e.target.value)}
+                                                disabled={isLoading}
+                                            >
+                                                <option value="">-- Pilih Kategori --</option>
+                                                <option value="IT">IT (Teknologi Informasi)</option>
+                                                <option value="IPSRS">IPSRS (Instalasi Pemeliharaan Sarana Rumah Sakit)</option>
+                                            </select>
+                                            {localErrors.category && <div className="text-danger">{localErrors.category}</div>}
+                                            {errors.category && <div className="text-danger">{errors.category}</div>}
                                         </div>
 
                                         <div className="form-group">

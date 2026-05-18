@@ -10,6 +10,17 @@ export default function ReportIndex({ auth, reports, totalReports, filters }) {
     const [status, setStatus] = useState(filters?.status || '');
     const [loading, setLoading] = useState(false);
 
+    const formatDateTime = (dateStr) => {
+        if (!dateStr) return '-';
+        return new Date(dateStr).toLocaleString('id-ID', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        }).replace(/\./g, ':');
+    };
+
     const handleFilter = (e) => {
         e.preventDefault();
         setLoading(true);
@@ -30,6 +41,13 @@ export default function ReportIndex({ auth, reports, totalReports, filters }) {
     const handleExport = () => {
         window.open(
             `/reports-file/export?start_date=${startDate}&end_date=${endDate}&status=${status}`,
+            '_blank'
+        );
+    };
+
+    const handleExportExcel = () => {
+        window.open(
+            `/reports-file/export-excel?start_date=${startDate}&end_date=${endDate}&status=${status}`,
             '_blank'
         );
     };
@@ -119,6 +137,17 @@ export default function ReportIndex({ auth, reports, totalReports, filters }) {
                                     Export PDF
                                 </button>
                             </div>
+
+                            <div className="col-auto mt-4">
+                                <button 
+                                    type="button" 
+                                    className="btn btn-success" 
+                                    style={{height:50}} 
+                                    onClick={handleExportExcel}
+                                >
+                                    Export Excel
+                                </button>
+                            </div>
                         </form>
 
                         {loading ? (
@@ -135,11 +164,11 @@ export default function ReportIndex({ auth, reports, totalReports, filters }) {
                                             <tr>
                                                 <th>No Pengaduan</th>
                                                 <th>Nama</th>
-                                                <th>Ruangan</th>
+                                                <th>Kategori</th>
                                                 <th>Fasilitas</th>
+                                                <th>Ruangan</th>
+                                                <th>Progress Waktu</th>
                                                 <th>Status</th>
-                                                <th>Tanggal Dibuat</th>
-                                                <th>Tanggal Response</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -148,32 +177,46 @@ export default function ReportIndex({ auth, reports, totalReports, filters }) {
                                                     <tr key={r.id}>
                                                         <td>{r.custom_id}</td>
                                                         <td>{r.name}</td>
-                                                        <td>{r.room}</td>
-                                                        <td>{r.facility}</td>
-                                                        <td>{r.status}</td>
                                                         <td>
-                                                            {new Date(r.created_at).toLocaleString('id-ID', {
-                                                                day: '2-digit',
-                                                                month: '2-digit',
-                                                                year: 'numeric',
-                                                                hour: '2-digit',
-                                                                minute: '2-digit',
-                                                            })}
+                                                            <span className="badge text-white" style={{ backgroundColor: r.category === 'IT' ? '#3498db' : '#e67e22', fontSize: '11px', padding: '5px 8px', borderRadius: '4px' }}>
+                                                                {r.category || '-'}
+                                                            </span>
+                                                        </td>
+                                                        <td>{r.facility}</td>
+                                                        <td>{r.room}</td>
+                                                        <td>
+                                                             <div style={{ fontSize: '12px', minWidth: '150px', lineHeight: '1.4' }}>
+                                                                 <div className="text-muted" style={{ marginBottom: '2px' }}>
+                                                                     <i className="far fa-clock text-primary mr-1" style={{ width: '14px' }}></i>
+                                                                     <strong>Buat:</strong> {formatDateTime(r.created_at)}
+                                                                 </div>
+                                                                 {r.processed_at && (
+                                                                     <div className="text-muted" style={{ marginBottom: '2px' }}>
+                                                                         <i className="fas fa-spinner text-info mr-1" style={{ width: '14px' }}></i>
+                                                                         <strong>Proses:</strong> {formatDateTime(r.processed_at)}
+                                                                     </div>
+                                                                 )}
+                                                                 {r.completed_at && (
+                                                                     <div className="text-success">
+                                                                         <i className="fas fa-check-circle text-success mr-1" style={{ width: '14px' }}></i>
+                                                                         <strong>Selesai:</strong> {formatDateTime(r.completed_at)}
+                                                                     </div>
+                                                                 )}
+                                                             </div>
                                                         </td>
                                                         <td>
-                                                            {new Date(r.updated_at).toLocaleString('id-ID', {
-                                                                day: '2-digit',
-                                                                month: '2-digit',
-                                                                year: 'numeric',
-                                                                hour: '2-digit',
-                                                                minute: '2-digit',
-                                                            })}
+                                                            <span className={`badge 
+                                                                ${r.status === "Sedang diajukan" ? "badge-warning" :
+                                                                    r.status === "Sedang diproses" ? "badge-info" :
+                                                                        "badge-success"}`}>
+                                                                {r.status}
+                                                            </span>
                                                         </td>
                                                     </tr>
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td colSpan="6" className="text-center">Tidak ada laporan</td>
+                                                    <td colSpan="7" className="text-center">Tidak ada laporan</td>
                                                 </tr>
                                             )}
                                         </tbody>

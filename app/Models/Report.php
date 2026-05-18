@@ -15,13 +15,16 @@ class Report extends Model
         'positions',
         'room',
         'facility',
+        'category',
         'description',
         'status',
         'note',
         'process_image',
         'image',
         'created_by',
-        'updated_by'
+        'updated_by',
+        'processed_at',
+        'completed_at'
     ];
 
     public function user()
@@ -36,6 +39,11 @@ class Report extends Model
     public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function histories()
+    {
+        return $this->hasMany(ReportHistory::class)->orderBy('created_at', 'asc');
     }
     public function getImageUrlAttribute()
     {
